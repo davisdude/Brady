@@ -306,6 +306,7 @@ layer:pop()
 
 ####Aliases
 - These functions are also available, and work just like their counterpart.
+
 | Alias			| Corresponding Function		|
 | -------------	|:-----------------------------:|
 | setPosition	| [moveTo](#cameramoveto)		|
@@ -314,7 +315,7 @@ layer:pop()
 | setRotation	| [rotateTo](#camerarotateto)	|
 
 ##Examples
-See [Examples](/examples/).
+See [Examples](https://github.com/davisdude/Brady/tree/master/Examples/).
 
 ##License
 A camera library with parallax scrolling for LÖVE.
