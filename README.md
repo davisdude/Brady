@@ -3,6 +3,33 @@ Brady
 
 A camera library with parallax scrolling for LÖVE. 
 
+#Table of Contents
+- [Usage](#usage)
+- [Functions](#functions)
+	- [Camera.new](#cameranew)
+	- [Camera:push](#camerapush)
+	- [Camera:pop](#camerapop)
+	- [Camera:addLayer](#cameraaddlayer)
+	- [Camera:getLayer](#cameragetlayer)
+	- [Camera:move](#cameramove)
+	- [Camera:moveTo](#cameramoveto)
+	- [Camera:zoom](#camerazoom)
+	- [Camera:zoomTo](#camerazoomto)
+	- [Camera:increaseZoom](#cameraincreasezoom)
+	- [Camera:rotate](#camerarotate)
+	- [Camera:getWindow](#cameragetwindow)
+	- [Camera:getVisible](#cameragetvisible)
+	- [Camera:toWorldCoordinates](#cameratoworldcoordinates)
+	- [Camera:toScreenCoordinates](#cameratoscreencoordinates)
+	- [Camera:getPoints](#cameragetpoints)
+	- [Camera:getStencil](#cameragetstencil)
+	- [Camera:setStencil](#camerasetstencil)
+	- [Camera:getShape](#cameragetshape)
+	- [Camera:setShape](#camerasetshape)
+	- [Aliases](#aliases)
+- [Examples](#examples)
+- [License](#license)
+
 ##Usage
 ```Lua
 local Camera = require 'Path.to.camera'
@@ -73,8 +100,6 @@ And that's it!
 	- `scale`: Number. The amount by which you increase/decrease the scale.
 - Returns: 
 	- Layer`: Table. The layer information that is drawn.
-		- Notes: 
-			- You can draw layers in two ways:
 ```Lua
 layer = Cam:addLayer( 'testLayer', .5 )
 
@@ -83,13 +108,6 @@ layer:push()
 	...
 layer:pop()
 ```
-Also just as acceptable:
-```Lua
-testLayer:push()
-	...
-testLayer:pop()
-```
-For this reason, you don't __really__ need to use a variable for most purposes. In other words, whatever you you pass as `name`, as long as it's an acceptable Lua variable, can also be used to refer to the layer.
 
 ####Camera:getLayer
 - Get the layer of a camera given the name.
@@ -286,8 +304,17 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 - Returns:
 	- Nothing.
 
-##Notes
-- Brady changes the metatable of `_G`. The currently pushed camera will be searched. If the `nil` variable matches any of the layers of the currently pushed layer, that variable will be returned instead.
+####Aliases
+- These functions are also available, and work just like their counterpart.
+| Alias			| Corresponding Function		|
+| -------------	|:-----------------------------:|
+| setPosition	| [moveTo](#cameramoveto)		|
+| setCenter		| [moveTo](#cameramoveto)		|
+| setZoom		| [zoomTo](#camerazoomto)		|
+| setRotation	| [rotateTo](#camerarotateto)	|
+
+##Examples
+See [Examples](/examples/).
 
 ##License
 A camera library with parallax scrolling for LÖVE.

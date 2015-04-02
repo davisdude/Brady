@@ -1,3 +1,9 @@
+0.2.0
+====
+- Removed metatable on _G.
+- Updated README.md
+- Edited README.md
+
 0.1.0
 ====
 - Initial release

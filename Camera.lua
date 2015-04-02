@@ -112,19 +112,7 @@ function Camera:addLayer( name, scale )
 	return self.layers[name]
 end
 
-local currentCamera = {}
-setmetatable( _G, { 
-	__index = function( tab, index )
-		if #currentCamera > 0 then
-			for i, v in pairs( currentCamera[#currentCamera].layers ) do
-				if i == index then return v end
-			end
-		end
-	end 
-} )
-
 function Camera:push()
-	table.insert( currentCamera, self )
 	love.graphics.setStencil( function() self:drawStencil() end ) 
 	self:getLayer( 'main' ):push()
 end
@@ -132,7 +120,6 @@ end
 function Camera:pop()
 	self:getLayer( 'main' ):pop()
 	love.graphics.setStencil() -- Set back to default
-	table.remove( currentCamera )
 end
 
 function Camera:getLayer( name )
