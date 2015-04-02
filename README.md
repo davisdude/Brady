@@ -48,7 +48,7 @@ And that's it!
 	- `Camera.push( Cam )
 	- `Cam:push()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camrea.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns: 
 	- Nothing.
 
@@ -98,9 +98,9 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Layer = Cam:getLayer( name )`
 - Arguments: 
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `name`: String. The name passed in [Camera:addLayer](#cameraaddLayer).
+	- `name`: String. The name passed in [Camera:addLayer](#cameraaddlayer).
 - Returns
-	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddLayer).
+	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddlayer).
 
 ####Camera:move
 - Move the camera by a certain amount.
@@ -212,7 +212,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 - Arguments: 
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Numbers. The screen x and y coordinates to be converted to the world.
-	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddLayer). Defaults to `'main'`.
+	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddlayer). Defaults to `'main'`.
 - Returns:
 	- `x`, `y`: Numbers. The x and y locations to the world.
 
@@ -224,7 +224,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 - Arguments: 
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Numbers. The x and y screen coordinates.
-	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddLayer). Defaults to `'main'`.
+	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddlayer). Defaults to `'main'`.
 - Returns:
 	- `x`, `y`: Nubmers. The x and y locations from the world to the screen.
 
