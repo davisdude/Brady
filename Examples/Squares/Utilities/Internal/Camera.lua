@@ -61,6 +61,11 @@ local Camera = {}
 Camera.__index = Camera
 
 function Camera.new( x, y, width, height )
+	err( 'new: Expected a number for x, the first argument. Got %type%.', x, 'number' )
+	err( 'new: Expected a number for y, the first argument. Got %type%.', y, 'number' )
+	err( 'new: Expected a number for width, the first argument. Got %type%.', width, 'number' )
+	err( 'new: Expected a number for height, the first argument. Got %type%.', height, 'number' )
+
 	local new = {
 		x = 0, y = 0,
 		screenX = x, screenY = y,
@@ -112,19 +117,7 @@ function Camera:addLayer( name, scale )
 	return self.layers[name]
 end
 
-local currentCamera = {}
-setmetatable( _G, { 
-	__index = function( tab, index )
-		if #currentCamera > 0 then
-			for i, v in pairs( currentCamera[#currentCamera].layers ) do
-				if i == index then return v end
-			end
-		end
-	end 
-} )
-
 function Camera:push()
-	table.insert( currentCamera, self )
 	love.graphics.setStencil( function() self:drawStencil() end ) 
 	self:getLayer( 'main' ):push()
 end
@@ -132,11 +125,15 @@ end
 function Camera:pop()
 	self:getLayer( 'main' ):pop()
 	love.graphics.setStencil() -- Set back to default
-	table.remove( currentCamera )
 end
 
 function Camera:getLayer( name )
+	err( 'getLayer: Expected string or number, got %type%.', name, 'string', 'number' )
 	return self.layers[name]
+end
+
+function Camera:getLayers()
+	return self.layers
 end
 
 function Camera:move( distanceX, distanceY )
@@ -160,15 +157,18 @@ function Camera:zoomTo( scaleX, scaleY )
 end
 
 function Camera:increaseZoom( xFactor, yFactor ) -- This is to allow more easy zooming using dt
+	err( 'increaseZoom: Expected number for the x-factor, got %type%.', xFactor, 'number' )
 	self.scaleX = self.scaleX + xFactor
 	self.scaleY = yFactor and self.scaleY + yFactor or self.scaleX
 end
 
 function Camera:rotate( amount )
+	err( 'rotate: Expected number, got %type%.', amount, 'number' )
 	self.rotation = self.rotation + amount
 end
 
 function Camera:rotateTo( rotation )
+	err( 'rotateTo: Expected number, got %type%.', rotation, 'number' )
 	self.rotation = rotation or 0
 end
 
@@ -242,6 +242,7 @@ function Camera:getStencil()
 end
 
 function Camera:setStencil( func )
+	err( 'setStencil: Expected function, got %type%.', func, 'function' )
 	self.drawStencil = func
 end
 
@@ -253,7 +254,11 @@ function Camera:setShape( ... )
 	-- TODO: Make it automatically set center of new camera to center of old camera?
 	local points = {}
 	if type( ... ) == 'table' then points = ... else points = { ... } end
+	for i = 1, #points do
+		err( 'setShape: Expected an array of numbers, element ' .. i .. ' was %type%.', points[i], 'number' )
+	end
 	local centerX, centerY = self.x, self.y
+
 	if #points == 3 then
 		self:setStencil( function() love.graphics.circle( 'fill', points[1], points[2], points[3] ) end )
 		self.width, self.height = points[3] * 2, points[3] * 2

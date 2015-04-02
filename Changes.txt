@@ -1,3 +1,8 @@
+0.2.1
+====
+- Added more error checking.
+- Added Camera:getLayers.
+
 0.2.0
 ====
 - Removed metatable on _G.

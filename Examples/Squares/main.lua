@@ -43,8 +43,8 @@ function love.load()
 	end
 	local function setCloseCamera()
 		Close = Camera( 64, 64, 400 - 2 * 64, 600 - 2 * 64 )
-		Close:addLayer( 'Background', .5, .5 )
-		Close:addLayer( 'Foreground', 2, 2 )
+		Background = Close:addLayer( 'Background', .5, .5 )
+		Foreground = Close:addLayer( 'Foreground', 2, 2 )
 		loadMap()
 	end
 
