@@ -1,0 +1,9 @@
+Controls:
+- WASD:		Move
+- Q and E:	Rotate
+- Mouse-wheel	Zoom
+- Left-Click	Make Square
+- O		Original Position
+- U		Clear squares
+- R		Reset
+- J, K, and L	Set shape: pentagon, rectangle, and circle
