@@ -58,7 +58,7 @@ And that's it!
 	- `Camera.pop( Cam )`
 	- `Cam:pop()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns
 	- Nothing.
 
@@ -68,7 +68,7 @@ And that's it!
 	- `Layer = Camera.addLayer( Cam, name, scale )`
 	- `Layer = Cam:addLayer( name, scale )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `name`: String. The name the camera will be referred to by.
 	- `scale`: Number. The amount by which you increase/decrease the scale.
 - Returns: 
@@ -97,10 +97,10 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Layer = Camera.getLayer( Cam, name )`
 	- `Layer = Cam:getLayer( name )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
-	- `name`: String. The name passed in [Camera:addLayer](#camera:addLayer).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
+	- `name`: String. The name passed in [Camera:addLayer](#cameraaddLayer).
 - Returns
-	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#camera:addLayer).
+	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddLayer).
 
 ####Camera:move
 - Move the camera by a certain amount.
@@ -108,7 +108,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.move( Cam, distanceX, distanceY )`
 	- `Cam:move( distanceX, distanceY )`
 - Arguments:
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `distanceX`, `distanceY`: Numbers. The distance to move the camera horizontally and vertically.
 - Returns: 
 	- Nothing.
@@ -119,7 +119,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.moveTo( Cam, [x, y] )`
 	- `Cam:moveTo( [x, y] )`
 - Arguments:
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Number. The center position for the camera. Defaults as 0, 0.
 
 ####Camera:zoom
@@ -128,7 +128,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera:zoom( Cam, [xFactor, yFactor] )`
 	- `Cam:zoom( [xFactor, yFactor] )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `xFactor`: Numbers. The amount by which to increase the horizontal scale. Defaults as 1.
 	- `yFactor`: Numbers. The amount by which to increase the vertical scale. Defaults as `xFactor`.
 - Returns:
@@ -142,7 +142,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.zoomTo( Cam, [scaleX, scaleY] )`
 	- `Cam:zoomTo( [scaleX, scaleY] )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `scaleX`: Number. The horizontal scale. Defaults to 1.
 	- `scaleY`: Number. The vertical scale. Defaults to `scaleX`.
 - Returns:
@@ -154,7 +154,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.increaseZoom( Cam, xFactor, [yFactor] )`
 	- `Cam:increaseZoom( xFactor, [yFactor] )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `xFactor`: Number. The amount by which to increase the horizontal scale.
 	- `yFactir`: Number. The amount by which to increase the vertical scale. Defaults to `xFactor`.
 - Returns:
@@ -166,7 +166,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.rotate( Cam, rotation )`
 	- `Cam:rotate( rotation )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `rotation`: Number. The amount by which to increase the rotation.
 - Returns:
 	- Nothing.
@@ -177,7 +177,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.rotateTo( Cam, rotation )`
 	- `Cam:rotateTo( rotation )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `rotation`: Number. The number (in radians) to set the rotation of the camera to.
 - Returns:
 	- Nothing.
@@ -188,7 +188,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.getWindow( Cam )`
 	- `Cam:getWindow`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns:
 	- `x`, `y`: Numbers. The x and y location of the camera on the screen.
 	- `width`, `height`: Numbers. The width and height of the camera on the screen.
@@ -199,7 +199,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.getVisible( Cam )`
 	- `Cam:getVisible()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns:
 	- `x`, `y`:` Numbers. The x and y location of the camera within the world.
 	- `width`, `height`: Numbers. The width and height of the camera within the world (this __does__ account for scaling).
@@ -210,9 +210,9 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.toWorldCoordinates( Cam, x, y, [layer] )`
 	- `Cam:toWorldCoordinates( x, y, [layer] )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Numbers. The screen x and y coordinates to be converted to the world.
-	- `layer`: String. The name passed by [Camera.addLayer](#camera.addLayer). Defaults to `'main'`.
+	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddLayer). Defaults to `'main'`.
 - Returns:
 	- `x`, `y`: Numbers. The x and y locations to the world.
 
@@ -222,9 +222,9 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.toScreenCoordinates( Cam, x, y, [layer] )`
 	- `Cam:toScreenCoordinates( x, y, [layer] )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Numbers. The x and y screen coordinates.
-	- `layer`: String. The name passed by [Camera.addLayer](#camera.addLayer). Defaults to `'main'`.
+	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddLayer). Defaults to `'main'`.
 - Returns:
 	- `x`, `y`: Nubmers. The x and y locations from the world to the screen.
 
@@ -234,7 +234,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.getPoints( Cam )`
 	- `Cam:getPoints()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns:
 	- `x1`, `y1`, `x2`, `y2`, `x3`, `y3`, `x4`, `y4`: Numbers. The points of the camera.
 
@@ -244,7 +244,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.getStencil( Cam )`
 	- `Cam:getStencil()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns:
 	- `stencil`: Function. The drawing function for the camera.
 
@@ -254,7 +254,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.setStencil( Cam, func )`
 	- `Cam:setStencil( func )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `func`: Function. The function for drawing the camera.
 - Returns:
 	- Nothing.
@@ -265,7 +265,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.getShape( Cam )`
 	- `Cam:getShape()`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns:
 	- `points`: Table. The points for drawing the camera's shape.
 		- 3 points means the camera is circular (x, y, r).
@@ -278,7 +278,7 @@ For this reason, you don't __really__ need to use a variable for most purposes. 
 	- `Camera.setShape( Cam, points )`
 	- `Cam:setShape( ... )`
 - Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#camera.new).
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `points`: Table. A table containing the points to be used for drawing the camera.
 		- 3 points means the camera is circular (x, y, r).
 		- 4 points means the camera is a rectangle (x, y, w, h).
