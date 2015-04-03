@@ -9,8 +9,16 @@ A camera library with parallax scrolling for LÖVE.
 	- [Camera.new](#cameranew)
 	- [Camera:push](#camerapush)
 	- [Camera:pop](#camerapop)
+	- [Camera:drawByZOrder](#cameradrawbyzorder)
 	- [Camera:addLayer](#cameraaddlayer)
 	- [Camera:getLayer](#cameragetlayer)
+	- [Layer](#layers)
+		- [Layer:push](#layerpush)
+		- [Layer:pop](#layerpop)
+		- [Layer:setRelativeScale](#layersetrelativescale)
+		- [Layer:getRelativeScale](#layergetrelativescale)
+		- [Layer:setDrawFunction](#layersetdrawfunction)
+		- [Layer:getDrawFunction](#layergetdrawfunction)
 	- [Camera:move](#cameramove)
 	- [Camera:moveTo](#cameramoveto)
 	- [Camera:zoom](#camerazoom)
@@ -89,6 +97,16 @@ And that's it!
 - Returns
 	- Nothing.
 
+####Camera:drawByZOrder
+- Adds manual z-ordering so you don't have to worry about it.
+- Synopses:
+	- `Camera.drawByZOrder( Cam )`
+	- `Cam:drawByZOrder()`
+- Arguments: 
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
+- Returns: 
+	- Nothing.
+
 ####Camera:addLayer
 - Adds a layer to the camera. Layers are used for parallax scrolling.
 - Synopses: 
@@ -119,6 +137,70 @@ layer:pop()
 	- `name`: String. The name passed in [Camera:addLayer](#cameraaddlayer).
 - Returns
 	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddlayer).
+
+####Layers
+- These are used for parallax scrolling. By default, a layer called `'main'` is created with relative scale of 1. This is actually where things not in other layers are drawn.
+#####Layer:push
+- Similar to [Camera:push](#camerapush), but acts as the push for the layer.
+- Synopses:
+	- `Layer.push( Layer )`
+	- `Layer:push()`
+- Arguments: 
+	- `layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+- Returns:
+	- Nothing.
+
+#####Layer:pop
+- Similar to [Camera:pop](#camerapop), but acts as the pop for the layer.
+- Synopses:
+	- `Layer.pop( Layer )`
+	- `Layer:pop()`
+- Arguments: 
+	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+- Returns:
+	- Nothing.
+
+#####Layer:setRelativeScale
+- Sets the amount that the layer is scaled by. For example, 2 would make everything larger.
+- Synopses:
+	- `Layer.setRelativeScale( Layer, scale )`
+	- `Layer:setRelativeScale( scale )`
+- Arguments: 
+	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+	- `scale`: Number. The amount by which the layer should increase the scaling.
+- Returns:
+	- Nothing.
+
+#####Layer:getRelativeScale
+- Gets the amount that the layer is scaled by.
+- Synopses:
+	- `relativeScale = Layer.getRelativeScale( Layer )`
+	- `relativeScale = Layer:getRelativeScale()`
+- Arguments: 
+	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+- Returns:
+	- `relativeScale`: Number. The relative scale of the layer.
+
+#####Layer:setDrawFunction
+- Sets the draw function to be used if you're using [Camera:drawByZOrder](#cameradrawbyzorder).
+- Synopses:
+	- `Layer.setDrawFunction( Layer, func )`
+	- `Layer:push( func )`
+- Arguments: 
+	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+	- `func`: Function. The function that is called when being drawn.
+- Returns:
+	- Nothing.
+
+#####Layer:getDrawFunction
+- Gets the draw function used by [Camera:drawByZOrder](#cameradrawbyzorder).
+- Synopses:
+	- `drawFunction = Layer.getDrawFunction( Layer )`
+	- `drawFunction = Layer:getDrawFunction()`
+- Arguments: 
+	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
+- Returns:
+	- `drawFunction`: Function. The function used by [Camera:drawByZOrder].
 
 ####Camera:move
 - Move the camera by a certain amount.

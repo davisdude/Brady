@@ -57,6 +57,17 @@ local function getCameraPoints( self )
 	return x1, y1, x2, y2, x3, y3, x4, y4
 end
 
+local function convertToArray( tab )
+	local new = {}
+	for i, v in pairs( tab ) do
+		table.insert( new, { i, v } )
+	end
+	return new
+end
+
+local function zOrder( tab )
+end
+
 local Camera = {}
 Camera.__index = Camera
 
@@ -78,6 +89,7 @@ function Camera.new( x, y, width, height )
 		end, 
 		shape = {}, -- Use these for custom screen shapes
 		layers = {}, 
+		zOrdered = {}, 
 	}
 
 	setmetatable( new, Camera )
@@ -106,13 +118,25 @@ function Camera:addLayer( name, scale )
 			love.graphics.pop()
 		end, 
 		setRelativeScale = function( layer, scale )
+			err( 'setRelativeScale: Scale must be a number, got %type%.', scale, 'number' )
 			layer.relativeScale = scale
 		end, 
 		getRelativeScale = function( layer )
 			return layer.relativeScale
 		end, 
+		setDrawFunction = function( layer, func )
+			err( 'setDrawFunction: Function must be a function, got %type%.', func, 'function' )
+			layer.drawFunction = func
+		end, 
+		getDrawFunction = function( layer )
+			return layer.drawFunction
+		end, 
 		relativeScale = scale, 
+		drawFunction = nil, 
 	}
+	local array = convertToArray( self.layers )
+	table.sort( array, function( a, b ) return a[2].relativeScale < b[2].relativeScale end )
+	self.zOrdered = array
 
 	return self.layers[name]
 end
@@ -125,6 +149,16 @@ end
 function Camera:pop()
 	self:getLayer( 'main' ):pop()
 	love.graphics.setStencil() -- Set back to default
+end
+
+function Camera:drawByZOrder()
+	self:push()
+	for i, v in ipairs( self.zOrdered ) do
+		v[2]:push()
+			v[2]:drawFunction()
+		v[2]:pop()
+	end
+	self:pop()
 end
 
 function Camera:getLayer( name )

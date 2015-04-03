@@ -1,3 +1,11 @@
+0.2.2
+====
+- Added automatic z-ordering
+- Added Layer:setDrawFunction 
+- Added Layer:getDrawFunction
+- Added error checking to Layer functions
+- Updated README.md
+
 0.2.1
 ====
 - Added more error checking.

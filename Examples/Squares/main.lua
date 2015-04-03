@@ -44,7 +44,22 @@ function love.load()
 	local function setCloseCamera()
 		Close = Camera( 64, 64, 400 - 2 * 64, 600 - 2 * 64 )
 		Background = Close:addLayer( 'Background', .5, .5 )
+		Background:setDrawFunction( function()
+			love.graphics.setColor( 255, 255, 255, 125 )
+			drawSquares()
+		end )
+
 		Foreground = Close:addLayer( 'Foreground', 2, 2 )
+		Foreground:setDrawFunction( function()
+			love.graphics.setColor( 255, 255, 255, 255 )
+			drawSquares()
+		end )
+
+		Close:getLayer( 'main' ):setDrawFunction( function()
+			love.graphics.setColor( 255, 255, 255, 200 )
+			drawSquares()
+		end )
+
 		loadMap()
 	end
 
@@ -154,21 +169,7 @@ function love.update( dt )
 end
 
 function love.draw()
-	Close:push()
-		Background:push()
-			love.graphics.setColor( 255, 255, 255, 125 )
-			-- drawMap()
-			drawSquares()
-		Background:pop()
-		love.graphics.setColor( 255, 255, 255, 200 )
-		-- drawMap()
-		drawSquares()
-
-		Foreground:push()
-			love.graphics.setColor( 255, 255, 255, 255 )
-			drawSquares()
-		Foreground:pop()
-	Close:pop()
+	Close:drawByZOrder()
 
 	Overview:push()
 		drawMap()
