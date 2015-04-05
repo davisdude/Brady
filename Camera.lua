@@ -192,12 +192,9 @@ end
 function Camera:adjustScale()
 	local scaledOffsetX, scaledOffsetY = getActualOffset( self, 1, 1 )
 	local realWidth, realHeight = scaledOffsetX * 2, scaledOffsetY * 2
-
-	local w, h, ww, wh = self.width, self.height, self.world.width, self.world.height
-	local rw, rh = realWidth, realHeight
-	local sx, sy = rw/ww, rh/wh
-	local rscale = math.max( sx, sy )
-	self:setZoom( math.max( self.scaleX, rscale ) )
+	local scaleX, scaleY = realWidth / self.world.width, realHeight / self.world.height
+	local realScale = math.max( scaleX, scaleY )
+	self:setZoom( math.max( self.scaleX, realScale ) )
 end
 
 function Camera:setWorld( x, y, width, height )
