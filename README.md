@@ -9,7 +9,11 @@ A camera library with parallax scrolling for LÖVE.
 	- [Camera.new](#cameranew)
 	- [Camera:push](#camerapush)
 	- [Camera:pop](#camerapop)
-	- [Camera:drawByZOrder](#cameradrawbyzorder)
+	- [Camera:draw](#cameradraw)
+	- [Camera:setWorld](#camerasetworld)
+	- [World Functions](#world-functions)
+		- [Camera:adjustscale](#cameraadjustscale)
+		- [Camera:adjustposition](#cameraadjustposition)
 	- [Camera:addLayer](#cameraaddlayer)
 	- [Camera:getLayer](#cameragetlayer)
 	- [Layer](#layers)
@@ -97,11 +101,46 @@ And that's it!
 - Returns
 	- Nothing.
 
-####Camera:drawByZOrder
+####Camera:draw
 - Adds manual z-ordering so you don't have to worry about it.
 - Synopses:
-	- `Camera.drawByZOrder( Cam )`
-	- `Cam:drawByZOrder()`
+	- `Camera.draw( Cam )`
+	- `Cam:draw()`
+- Arguments: 
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
+- Returns: 
+	- Nothing.
+
+####Camera:setWorld
+- Set world boundaries (AABB) required for certain functions.
+- Synopses:
+	- `World = Camera.setWorld( Cam, x, y, width, height )`
+	- `World = Cam:setWorld( x, y, width, height )`
+- Arguments: 
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
+	- `x`, `y`: Numbers. The top left x and y coordinates for the world.
+	- `width`, `height`: Numbers. The width and height of the world. 
+- Returns: 
+	- `World`: Table. A table with the world's information (`{ x = x, y, = y, width = width, height = height }`)
+
+####World Functions
+- These functions require a world to be set using [Camera:setWorld](#camerasetworld).
+
+#####Camera:adjustScale
+- Put this inside of love.update in order to keep the camera scaled within the world coordinates. This does __not__ acount for position, for that see [Camera:adjustPosition](#cameraadjustposition).
+- Synopses:
+	- `Camera.adjustScale( Cam )`
+	- `Cam:adjustScale()`
+- Arguments: 
+	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
+- Returns: 
+	- Nothing.
+
+#####Camera:adjustPosition
+- Put this inside of love.update in order to keep the camera positioned within the world (i.e. you can't see outside of the world boundaries). This does __not__ account for scaling (and frankly, doesn't really work without bound-scaling), for that, see [Camera:adjustScale](#cameraadjustscale).
+- Synopses:
+	- `Camera.adjustPosition( Cam )`
+	- `Cam:adjustPosition()`
 - Arguments: 
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns: 
@@ -140,6 +179,7 @@ layer:pop()
 
 ####Layers
 - These are used for parallax scrolling. By default, a layer called `'main'` is created with relative scale of 1. This is actually where things not in other layers are drawn.
+
 #####Layer:push
 - Similar to [Camera:push](#camerapush), but acts as the push for the layer.
 - Synopses:
@@ -182,7 +222,7 @@ layer:pop()
 	- `relativeScale`: Number. The relative scale of the layer.
 
 #####Layer:setDrawFunction
-- Sets the draw function to be used if you're using [Camera:drawByZOrder](#cameradrawbyzorder).
+- Sets the draw function to be used if you're using [Camera:draw](#cameradraw).
 - Synopses:
 	- `Layer.setDrawFunction( Layer, func )`
 	- `Layer:push( func )`
@@ -193,14 +233,14 @@ layer:pop()
 	- Nothing.
 
 #####Layer:getDrawFunction
-- Gets the draw function used by [Camera:drawByZOrder](#cameradrawbyzorder).
+- Gets the draw function used by [Camera:draw](#cameradraw).
 - Synopses:
 	- `drawFunction = Layer.getDrawFunction( Layer )`
 	- `drawFunction = Layer:getDrawFunction()`
 - Arguments: 
 	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
 - Returns:
-	- `drawFunction`: Function. The function used by [Camera:drawByZOrder].
+	- `drawFunction`: Function. The function used by [Camera:draw].
 
 ####Camera:move
 - Move the camera by a certain amount.

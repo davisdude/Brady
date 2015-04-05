@@ -2,6 +2,8 @@
 ====
 - Fixed Camera:adjustScale
 - Added Camera:adjustPosition
+- Added Camera:getWorld
+- Updated README.md
 
 0.3.0
 ====

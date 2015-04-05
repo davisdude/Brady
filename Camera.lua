@@ -209,6 +209,10 @@ function Camera:setWorld( x, y, width, height )
 	return self.world
 end
 
+function Camera:getWorld()
+	return self.world
+end
+
 function Camera:getLayer( name )
 	err( 'getLayer: Expected string or number, got %type%.', name, 'string', 'number' )
 	return self.layers[name]
