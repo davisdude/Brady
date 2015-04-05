@@ -1,6 +1,7 @@
 -- Libraries
 Input = require 'Utilities.thomas.Input'
 local Class = require 'Utilities.classic.classic'
+local Camera = require 'Camera'
 
 local Square = Class:extend( 'Square' )
 function Square:new( x, y, width, height )
@@ -26,8 +27,6 @@ local function checkAABB( px, py, x, y, w, h )
 	end
 end
 
-local Camera = require 'Utilities.Internal.Camera'
-
 local Close
 local Overview
 local width
@@ -37,12 +36,15 @@ function love.load()
 		Squares = {}
 	end
 	local function loadMap()
+		clearSquares()
 		for i = 1, love.math.random( 11, 16 ) do
 			table.insert( Squares, Square( love.math.random( -400, 400 ), love.math.random( -300, 300 ), love.math.random( 50, 100 ), love.math.random( 50, 100 ) ) )
 		end
 	end
 	local function setCloseCamera()
 		Close = Camera( 64, 64, 400 - 2 * 64, 600 - 2 * 64 )
+		Close:setPosition( 400, 300 )
+
 		Background = Close:addLayer( 'Background', .5, .5 )
 		Background:setDrawFunction( function()
 			love.graphics.setColor( 255, 255, 255, 125 )
@@ -59,6 +61,8 @@ function love.load()
 			love.graphics.setColor( 255, 255, 255, 200 )
 			drawSquares()
 		end )
+		
+		Close:setWorld( 0, 0, 800, 600 )
 
 		loadMap()
 	end
@@ -116,12 +120,18 @@ local function drawMap()
 	-- Center of camera
 	love.graphics.setColor( 255, 125, 0 )
 	love.graphics.circle( 'fill', Close.x, Close.y, 5 * ( 1 / Close.scaleX ) - 1 )
+	-- Draw world boundaries
+	love.graphics.setColor( 255, 125, 0 )
+	love.graphics.rectangle( 'line', 0, 0, 800, 600 )
+	-- Reset Color
 	love.graphics.setColor( 255, 255, 255 )
 end
 
 function love.update( dt )
 	local horizontalMoveSpeed = ( 1 / Close.scaleX ) * 256
 	local verticalMoveSpeed = ( 1 / Close.scaleY ) * 256
+
+	Close:adjustScale()
 
 	if input:down( 'moveRight' ) then
 		Close:move( -horizontalMoveSpeed * dt, 0 )
@@ -169,7 +179,7 @@ function love.update( dt )
 end
 
 function love.draw()
-	Close:drawByZOrder()
+	Close:draw()
 
 	Overview:push()
 		drawMap()

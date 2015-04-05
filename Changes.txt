@@ -1,3 +1,9 @@
+0.3.0
+====
+- Added worlds
+	- Added Camera:setWorld
+- Renamed Camera:drawByZOrder to Camera:draw
+
 0.2.2
 ====
 - Added automatic z-ordering

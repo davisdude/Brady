@@ -65,7 +65,13 @@ local function convertToArray( tab )
 	return new
 end
 
-local function zOrder( tab )
+local function checkAABB( x, y, width, height, px, py )
+	return px >= x and px <= x + width 
+	   and py >= y and py <= y + height
+end
+
+local function clamp( number, min, max )
+	return math.min( math.max( number, min ), max )
 end
 
 local Camera = {}
@@ -151,14 +157,78 @@ function Camera:pop()
 	love.graphics.setStencil() -- Set back to default
 end
 
-function Camera:drawByZOrder()
+function Camera:draw()
 	self:push()
 	for i, v in ipairs( self.zOrdered ) do
-		v[2]:push()
-			v[2]:drawFunction()
-		v[2]:pop()
+		local layer = v[2]
+		layer:push()
+			layer:drawFunction()
+		layer:pop()
 	end
 	self:pop()
+end
+
+local function getTargetSize( worldX, worldWidth, px, width )
+	local distance = px - worldX
+	if distance < 0 then -- Left of the AABB
+		return width + 2 * distance
+	elseif distance > 0 then -- Right of AABB
+		distance = px - ( worldX + worldWidth )
+		if distance > 0 then
+			return width - 2 * distance
+		end
+	end
+end
+
+local function getOutsidePoints( self )
+	local points = { getCameraPoints( self ) }
+	local tab = {}
+	for i = 1, #points, 2 do
+		if not checkAABB( self.world.x, self.world.y, self.world.width, self.world.height, points[i], points[i + 1] ) then
+			table.insert( tab, points[i] )
+			table.insert( tab, points[i + 1] )
+		end
+	end
+	return tab
+end
+
+function Camera:adjustScale() 
+	-- This only works if self.x and y are within the world bounds. 
+	self.x = clamp( self.x, self.world.x, self.world.x + self.world.width )
+	self.y = clamp( self.y, self.world.y, self.world.y + self.world.height )
+	
+	local x, y, width, height = self:getVisible()
+	local outside = getOutsidePoints( self )	
+	while #outside > 0 do -- Use the while-loop incase camera points are both above and below the world
+		local px, py = outside[1], outside[2]
+		local targetWidth, targetHeight = getTargetSize( self.world.x, self.world.width, px, width ), getTargetSize( self.world.y, self.world.height, py, height )
+	
+		local scale
+		if targetWidth then
+			scale = ( targetWidth ) / width
+		elseif targetHeight then
+			scale = ( targetHeight ) / height 
+		else
+			scale = 1
+		end
+
+		self:zoom( 1 / scale )
+
+		table.remove( outside, 1 )
+		table.remove( outside, 1 )
+
+		outside = getOutsidePoints( self )
+	end
+end
+
+
+function Camera:setWorld( x, y, width, height )
+	err( 'setWorld: Expected x to be a number, got %type%.', x, 'number' )
+	err( 'setWorld: Expected y to be a number, got %type%.', y, 'number' )
+	err( 'setWorld: Expected width to be a number, got %type%.', width, 'number' )
+	err( 'setWorld: Expected height to be a number, got %type%.', height, 'number' )
+	self.world = { x = x, y = y, width = width, height = height }
+	return self.world
 end
 
 function Camera:getLayer( name )
