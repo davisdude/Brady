@@ -168,59 +168,37 @@ function Camera:draw()
 	self:pop()
 end
 
-local function getTargetSize( worldX, worldWidth, px, width )
-	local distance = px - worldX
-	if distance < 0 then -- Left of the AABB
-		return width + 2 * distance
-	elseif distance > 0 then -- Right of AABB
-		distance = px - ( worldX + worldWidth )
-		if distance > 0 then
-			return width - 2 * distance
-		end
-	end
-end
-
-local function getOutsidePoints( self )
-	local points = { getCameraPoints( self ) }
-	local tab = {}
-	for i = 1, #points, 2 do
-		if not checkAABB( self.world.x, self.world.y, self.world.width, self.world.height, points[i], points[i + 1] ) then
-			table.insert( tab, points[i] )
-			table.insert( tab, points[i + 1] )
-		end
-	end
-	return tab
-end
-
-function Camera:adjustScale() 
-	-- This only works if self.x and y are within the world bounds. 
-	self.x = clamp( self.x, self.world.x, self.world.x + self.world.width )
-	self.y = clamp( self.y, self.world.y, self.world.y + self.world.height )
+local function getActualOffset( self, scaleX, scaleY )
+	scaleX = scaleX or self.scaleX
+	scaleY = scaleY or self.scaleY
+	local cos, sin = math.cos( self.rotation ), math.sin( self.rotation )
+	-- Make angle acute
+	cos, sin = math.abs( cos ), math.abs( sin )
 	
-	local x, y, width, height = self:getVisible()
-	local outside = getOutsidePoints( self )	
-	while #outside > 0 do -- Use the while-loop incase camera points are both above and below the world
-		local px, py = outside[1], outside[2]
-		local targetWidth, targetHeight = getTargetSize( self.world.x, self.world.width, px, width ), getTargetSize( self.world.y, self.world.height, py, height )
-	
-		local scale
-		if targetWidth then
-			scale = ( targetWidth ) / width
-		elseif targetHeight then
-			scale = ( targetHeight ) / height 
-		else
-			scale = 1
-		end
-
-		self:zoom( 1 / scale )
-
-		table.remove( outside, 1 )
-		table.remove( outside, 1 )
-
-		outside = getOutsidePoints( self )
-	end
+	local offsetX, offsetY = self.offsetX / scaleX, self.offsetY / scaleY
+	return cos * offsetX + sin * offsetY, sin * offsetX + cos * offsetY
 end
 
+-- Stolen from https://github.com/kikito/gamera/blob/master/gamera.lua#L54
+function Camera:adjustPosition()
+	local scaledOffsetX, scaledOffsetY = getActualOffset( self )
+	local left, top = self.world.x + scaledOffsetX, self.world.y + scaledOffsetY
+	local right, bottom = self.world.x + self.world.width - scaledOffsetX, self.world.y + self.world.height - scaledOffsetY
+
+	self.x, self.y = clamp( self.x, left, right ), clamp( self.y, top, bottom )
+end
+
+-- Stolen from https://github.com/kikito/gamera/blob/master/gamera.lua#L65
+function Camera:adjustScale()
+	local scaledOffsetX, scaledOffsetY = getActualOffset( self, 1, 1 )
+	local realWidth, realHeight = scaledOffsetX * 2, scaledOffsetY * 2
+
+	local w, h, ww, wh = self.width, self.height, self.world.width, self.world.height
+	local rw, rh = realWidth, realHeight
+	local sx, sy = rw/ww, rh/wh
+	local rscale = math.max( sx, sy )
+	self:setZoom( math.max( self.scaleX, rscale ) )
+end
 
 function Camera:setWorld( x, y, width, height )
 	err( 'setWorld: Expected x to be a number, got %type%.', x, 'number' )

@@ -92,13 +92,13 @@ function love.load()
 
 	Overview = Camera( 400, 0, 400, 600 )
 	Overview:zoomTo( .25 )
+	Overview:setPosition( 400, 300 )
+
 	width = 16
 	height = width
 
 	Squares = {}
 	setCloseCamera()
-
-	-- Close:toWorldCoordinates( 3, 3, 'adsf' )
 end
 
 local function drawMap()
@@ -132,6 +132,7 @@ function love.update( dt )
 	local verticalMoveSpeed = ( 1 / Close.scaleY ) * 256
 
 	Close:adjustScale()
+	Close:adjustPosition()
 
 	if input:down( 'moveRight' ) then
 		Close:move( -horizontalMoveSpeed * dt, 0 )
