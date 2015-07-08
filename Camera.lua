@@ -1,8 +1,3 @@
---[[
-	To-Do:
-		- Make center same independent of shape
-]]
-
 local unpack = unpack or table.unpack
 
 local function err( errCode, passed, ... )
@@ -53,7 +48,7 @@ local function getCameraPoints( self )
 	x2, y2 = rotateAboutPoint( centerX, centerY, -self.rotation, x2, y2 )
 	x3, y3 = rotateAboutPoint( centerX, centerY, -self.rotation, x3, y3 )
 	x4, y4 = rotateAboutPoint( centerX, centerY, -self.rotation, x4, y4 )
-	
+
 	return x1, y1, x2, y2, x3, y3, x4, y4
 end
 
@@ -66,12 +61,23 @@ local function convertToArray( tab )
 end
 
 local function checkAABB( x, y, width, height, px, py )
-	return px >= x and px <= x + width 
+	return px >= x and px <= x + width
 	   and py >= y and py <= y + height
 end
 
 local function clamp( number, min, max )
 	return math.min( math.max( number, min ), max )
+end
+
+local function getActualOffset( self, scaleX, scaleY )
+	scaleX = scaleX or self.scaleX
+	scaleY = scaleY or self.scaleY
+	local cos, sin = math.cos( self.rotation ), math.sin( self.rotation )
+	-- Make angle acute
+	cos, sin = math.abs( cos ), math.abs( sin )
+
+	local offsetX, offsetY = self.offsetX / scaleX, self.offsetY / scaleY
+	return cos * offsetX + sin * offsetY, sin * offsetX + cos * offsetY
 end
 
 local Camera = {}
@@ -90,12 +96,15 @@ function Camera.new( x, y, width, height )
 		scaleX = 1, scaleY = 1,
 		offsetX = width / 2, offsetY = height / 2,
 		rotation = 0,
+        shakeID = 0,
+        shakes = {},
+        -- maxShakeMagnitude 
 		drawStencil = function( self )
 			love.graphics.rectangle( 'fill', self.screenX, self.screenY, self.width, self.height )
-		end, 
+		end,
 		shape = {}, -- Use these for custom screen shapes
-		layers = {}, 
-		zOrdered = {}, 
+		layers = {},
+		zOrdered = {},
 	}
 
 	setmetatable( new, Camera )
@@ -107,7 +116,7 @@ end
 function Camera:addLayer( name, scale )
 	err( 'addLayer: Layer name must be string or number, got %type%.', name, 'string', 'number' )
 	err( 'addLayer: Layer scale must be number, got %type%.', scale, 'number' )
-	
+
 	self.layers[name] = {
 		push = function( layer )
 			love.graphics.push( 'transform' ) -- Shouldn't interfere
@@ -116,29 +125,29 @@ function Camera:addLayer( name, scale )
 				love.graphics.rotate( self.rotation )
 				love.graphics.scale( self.scaleX * layer.relativeScale, self.scaleY * layer.relativeScale )
 				love.graphics.translate( -self.offsetX - self.screenX, -self.offsetY - self.screenY ) -- Move zoom and rotation back to normal for drawing.
-	
+
 				love.graphics.translate( self.offsetX + self.screenX, self.offsetY + self.screenY )
 				love.graphics.translate( -self.x, -self.y )
-		end, 
+		end,
 		pop = function( layer )
 			love.graphics.pop()
-		end, 
+		end,
 		setRelativeScale = function( layer, scale )
 			err( 'setRelativeScale: Scale must be a number, got %type%.', scale, 'number' )
 			layer.relativeScale = scale
-		end, 
+		end,
 		getRelativeScale = function( layer )
 			return layer.relativeScale
-		end, 
+		end,
 		setDrawFunction = function( layer, func )
 			err( 'setDrawFunction: Function must be a function, got %type%.', func, 'function' )
 			layer.drawFunction = func
-		end, 
+		end,
 		getDrawFunction = function( layer )
 			return layer.drawFunction
-		end, 
-		relativeScale = scale, 
-		drawFunction = nil, 
+		end,
+		relativeScale = scale,
+		drawFunction = nil,
 	}
 	local array = convertToArray( self.layers )
 	table.sort( array, function( a, b ) return a[2].relativeScale < b[2].relativeScale end )
@@ -147,8 +156,24 @@ function Camera:addLayer( name, scale )
 	return self.layers[name]
 end
 
+function Camera:preUpdate()
+    self:adjustScale()
+    self:adjustPosition()
+end
+
+function Camera:update( dt )
+    self:preUpdate()
+    self:move( self:updateShake( dt ) )
+    self:postUpdate()
+end
+-- {{{
+function Camera:postUpdate()
+    self:adjustScale()
+    self:adjustPosition()
+end
+
 function Camera:push()
-	love.graphics.setStencil( function() self:drawStencil() end ) 
+	love.graphics.setStencil( function() self:drawStencil() end )
 	self:getLayer( 'main' ):push()
 end
 
@@ -168,33 +193,26 @@ function Camera:draw()
 	self:pop()
 end
 
-local function getActualOffset( self, scaleX, scaleY )
-	scaleX = scaleX or self.scaleX
-	scaleY = scaleY or self.scaleY
-	local cos, sin = math.cos( self.rotation ), math.sin( self.rotation )
-	-- Make angle acute
-	cos, sin = math.abs( cos ), math.abs( sin )
-	
-	local offsetX, offsetY = self.offsetX / scaleX, self.offsetY / scaleY
-	return cos * offsetX + sin * offsetY, sin * offsetX + cos * offsetY
-end
-
--- Stolen from https://github.com/kikito/gamera/blob/master/gamera.lua#L54
+-- Stolen from https://github.com/kikito/gamera/blob/1e5f1b37377145d5d1106db6aed42663ddd0d36d/gamera.lua#L54
 function Camera:adjustPosition()
-	local scaledOffsetX, scaledOffsetY = getActualOffset( self )
-	local left, top = self.world.x + scaledOffsetX, self.world.y + scaledOffsetY
-	local right, bottom = self.world.x + self.world.width - scaledOffsetX, self.world.y + self.world.height - scaledOffsetY
+    if self.world then
+        local scaledOffsetX, scaledOffsetY = getActualOffset( self )
+        local left, top = self.world.x + scaledOffsetX, self.world.y + scaledOffsetY
+        local right, bottom = self.world.x + self.world.width - scaledOffsetX, self.world.y + self.world.height - scaledOffsetY
 
-	self.x, self.y = clamp( self.x, left, right ), clamp( self.y, top, bottom )
+        self.x, self.y = clamp( self.x, left, right ), clamp( self.y, top, bottom )
+    end
 end
 
--- Stolen from https://github.com/kikito/gamera/blob/master/gamera.lua#L65
+-- Stolen from https://github.com/kikito/gamera/blob/1e5f1b37377145d5d1106db6aed42663ddd0d36d/gamera.lua#L65
 function Camera:adjustScale()
-	local scaledOffsetX, scaledOffsetY = getActualOffset( self, 1, 1 )
-	local realWidth, realHeight = scaledOffsetX * 2, scaledOffsetY * 2
-	local scaleX, scaleY = realWidth / self.world.width, realHeight / self.world.height
-	local realScale = math.max( scaleX, scaleY )
-	self:setZoom( math.max( self.scaleX, realScale ) )
+    if self.world then
+        local scaledOffsetX, scaledOffsetY = getActualOffset( self, 1, 1 )
+        local realWidth, realHeight = scaledOffsetX * 2, scaledOffsetY * 2
+        local scaleX, scaleY = realWidth / self.world.width, realHeight / self.world.height
+        local realScale = math.max( scaleX, scaleY )
+        self:setZoom( math.max( self.scaleX, realScale ) )
+    end
 end
 
 function Camera:setWorld( x, y, width, height )
@@ -220,8 +238,8 @@ function Camera:getLayers()
 end
 
 function Camera:move( distanceX, distanceY )
-	self.x = self.x + ( distanceX or 0 ) 
-	self.y = self.y + ( distanceY or 0 ) 
+	self.x = self.x + ( distanceX or 0 )
+	self.y = self.y + ( distanceY or 0 )
 end
 
 function Camera:moveTo( x, y )
@@ -290,17 +308,17 @@ function Camera:toWorldCoordinates( x, y, layer )
 	y = cameraY + distanceY
 	-- Rotate
 	x, y = rotateAboutPoint( self.x, self.y, -self.rotation, x, y )
-	
+
 	return x, y
 end
 
-function Camera:toScreenCoordinates( x, y, layer ) 
+function Camera:toScreenCoordinates( x, y, layer )
 	layer = layer or 'main'
 	err( 'toScreenCoordinates: x must be number, got %%type%%.', x, 'number' )
 	err( 'toScreenCoordinates: y must be number, got %%type%%.', y, 'number' )
 	err( 'toScreenCoordinates: layer name should be string or number, got %type%.', layer, 'string', 'number' )
 	err( 'toScreenCoordinates: layer "' .. layer .. '" not registered.', layer, function( t ) return self.layers[t] end )
-	
+
 	local multiple = self.layers[layer]:getRelativeScale()
 	-- Get actual Camera x and y
 	local cameraX, cameraY = getActualCameraPosition( self )
@@ -312,8 +330,12 @@ function Camera:toScreenCoordinates( x, y, layer )
 	-- Subtract scaled distance from camera
 	x = ( distanceX - cameraX ) * self.scaleX
 	y = ( distanceY - cameraY ) * self.scaleY
-	
+
 	return x, y
+end
+
+function Camera:getMouseCoordinates()
+    return self:getWorldCoordinates( love.mouse.getPosition() )
 end
 
 function Camera:getPoints()
@@ -333,8 +355,7 @@ function Camera:getShape()
 	return self.shape
 end
 
-function Camera:setShape( ... ) 
-	-- TODO: Make it automatically set center of new camera to center of old camera?
+function Camera:setShape( ... )
 	local points = {}
 	if type( ... ) == 'table' then points = ... else points = { ... } end
 	for i = 1, #points do
@@ -347,13 +368,13 @@ function Camera:setShape( ... )
 		self.width, self.height = points[3] * 2, points[3] * 2
 		self.offsetX, self.offsetY = points[3], points[3]
 		self.screenX, self.screenY = points[1] - points[3], points[2] - points[3]
-		self:setPosition( centerX, centerY )
+		self:moveTo( centerX, centerY )
 	elseif #points == 4 then
 		self:setStencil( function() love.graphics.rectangle( 'fill', points[1], points[2], points[3], points[4] ) end )
 		self.width, self.height = points[3], points[4]
 		self.offsetX, self.offsetY = self.width / 2, self.height / 2
 		self.screenX, self.screenY = points[1], points[2]
-		self:setPosition( centerX, centerY )
+		self:moveTo( centerX, centerY )
 	elseif #points % 2 == 0 then
 		local triangles = love.math.triangulate( points )
 		-- Triangulation prevents problems with complex polygons
@@ -374,17 +395,71 @@ function Camera:setShape( ... )
 		self.height = math.max( unpack( y ) ) - math.min( unpack( y ) )
 		self.offsetX, self.offsetY = self.width / 2, self.height / 2
 		self.screenX, self.screenY = math.min( unpack( x ) ), math.min( unpack( y ) )
-		self:setPosition( centerX, centerY )
+		self:moveTo( centerX, centerY )
 	else
 		error( string.format( 'Camera Error: setShape- expected 3, 4, or an even number of points, got %s.' ), #points )
 	end
 end
 
+function Camera:shake( intensity, duration, settings )
+	err( 'shake: Expected argument 1, intensity, to be a number got %type%.', intensity, 'number' )
+	err( 'shake: Expected argument 2, duration, to be a number, got %type%.', duration, 'number' )
+	err( 'shake: Expected argument 3, settings, to be a table or nil, got %type%.', settings, 'table', 'nil' )
+    settings = settings or {}
+    self.shakeID = self.shakeID + 1
+    table.insert( self.shakes, {
+        id = self.shakeID,
+        intensity = intensity,
+        duration = duration,
+        timer = 0,
+        direction = string.lower( settings.direction or 'both' ),
+    } )
+end
+
+function Camera:removeShake( id )
+    err( 'removeShake: Expected argument 1, id, to be a number, got %type%.', id, 'number' )
+    for i = #self.shakes, 1, -1 do
+        if self.shakes[i].id == id then
+            table.remove( self.shakes, i )
+            return true
+        end
+    end
+end
+
+function Camera:updateShake( dt )
+    local intensity = { 0, 0 }
+    for _, shake in ipairs( self.shakes ) do
+        shake.timer = shake.timer + dt
+        if shake.timer < shake.duration then
+            if shake.direction == 'both' or shake.direction == 'horizontal' then
+                intensity[1] = intensity[1] + shake.intensity
+            end
+            if shake.direction == 'both' or shake.direction == 'vertical' then
+                intensity[2] = intensity[2] + shake.intensity
+            end
+        else
+            self:removeShake( shake.id )
+        end
+    end
+    self:move( love.math.random( -intensity[1], intensity[1] ), love.math.random( -intensity[2], intensity[2] ) )
+end
+
+-- TODO: camera components
+-- Camera Components (each returns the distance the camera will be moved)
+--[[
+    positionLock, -- ent, fallback (for when ent dies)
+    edgeSnape, -- hor drift, [vert drift], -- Needs world bounds
+    cameraWindow, -- x, y, width, height, onExit{ left, right, up, down }
+    lerp, -- to, time, type,
+    average,
+    zoomToFit, -- objects (w/ x, y, w, h)
+]]
+
 -- Aliases
 Camera.setPosition = Camera.moveTo
 Camera.setZoom = Camera.zoomTo
 Camera.setRotation = Camera.rotateTo
-Camera.setCenter = Camera.setPosition
+Camera.setCenter = Camera.moveTo
 
 return setmetatable( Camera,
 	{

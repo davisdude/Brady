@@ -61,12 +61,19 @@ function love.load()
 			love.graphics.setColor( 255, 255, 255, 200 )
 			drawSquares()
 		end )
-		
+
 		Close:setWorld( 0, 0, 800, 600 )
 
 		loadMap()
 	end
+    
+    -- Set up map and Close camera
+	width = 16
+	height = width
+	Squares = {}
+	setCloseCamera()
 
+    -- Bind keys
 	input = Input()
 	input:bind( 'escape', love.event.quit )
 
@@ -86,36 +93,32 @@ function love.load()
 	input:bind( 'r', function() clearSquares(); setCloseCamera() end ) -- Reset
 
 
-	input:bind( 'j', function() Close:setShape( 138, 110, 0, 300, 138, 490, 362, 418, 362, 182 ) end ) 
-	input:bind( 'k', function() Close:setShape( 64, 64, 400 - 2 * 64, 600 - 2 * 64 ) end ) 
-	input:bind( 'l', function() Close:setShape( 200, 300, 200 ) end ) 
+	input:bind( 'j', function() Close:setShape( 138, 110, 0, 300, 138, 490, 362, 418, 362, 182 ) end )
+	input:bind( 'k', function() Close:setShape( 64, 64, 400 - 2 * 64, 600 - 2 * 64 ) end )
+	input:bind( 'l', function() Close:setShape( 200, 300, 200 ) end )
+    input:bind( ' ', function() Close:shake( 50, .125 ) end )
 
+    -- Set up Overview camera
 	Overview = Camera( 400, 0, 400, 600 )
 	Overview:zoomTo( .25 )
 	Overview:setPosition( 400, 300 )
-
-	width = 16
-	height = width
-
-	Squares = {}
-	setCloseCamera()
 end
 
 local function drawMap()
 	-- Draw 0, 0
 	love.graphics.setColor( 255, 255, 255 )
 	love.graphics.circle( 'fill', 0, 0, 5 )
+	-- Horizontal origin line
+	love.graphics.setColor( 0, 255, 0 )
+	love.graphics.line( 400, 0, 400, 600 )
 	-- Vertical origin line
 	love.graphics.setColor( 255, 0, 0 )
 	love.graphics.line( 0, 300, 800, 300 )
-	-- Horizontal origin line
-	love.graphics.setColor( 0, 0, 255 )
-	love.graphics.line( 400, 0, 400, 600 )
 	-- Camera bounding box
-	love.graphics.setColor( 0, 255, 0 )
+	love.graphics.setColor( 125, 125, 125 )
 	love.graphics.rectangle( 'line', Close:getVisible() )
 	-- Actual camera dimensions
-	love.graphics.setColor( 125, 125, 125 )
+	love.graphics.setColor( 0, 0, 255 )
 	love.graphics.polygon( 'line', Close:getPoints() )
 	-- Center of camera
 	love.graphics.setColor( 255, 125, 0 )
@@ -131,33 +134,21 @@ function love.update( dt )
 	local horizontalMoveSpeed = ( 1 / Close.scaleX ) * 256
 	local verticalMoveSpeed = ( 1 / Close.scaleY ) * 256
 
-	Close:adjustScale()
-	Close:adjustPosition()
+    Close:preUpdate()
 
-	if input:down( 'moveRight' ) then
-		Close:move( -horizontalMoveSpeed * dt, 0 )
-	end
-	if input:down( 'moveLeft' ) then
-		Close:move( horizontalMoveSpeed * dt, 0 )
-	end
-	if input:down( 'moveUp' ) then
-		Close:move( 0, -verticalMoveSpeed * dt )
-	end
-	if input:down( 'moveDown' ) then
-		Close:move( 0, verticalMoveSpeed * dt )
-	end
-	if input:down( 'rotateLeft' ) then
-		Close:rotate( math.pi / 2 * dt )
-	end
-	if input:down( 'rotateRight' ) then
-		Close:rotate( -math.pi / 2 * dt )
-	end
+	if input:down( 'moveRight' ) then Close:move( -horizontalMoveSpeed * dt, 0 ) end
+	if input:down( 'moveLeft' ) then Close:move( horizontalMoveSpeed * dt, 0 ) end
+	if input:down( 'moveUp' ) then Close:move( 0, -verticalMoveSpeed * dt ) end
+	if input:down( 'moveDown' ) then Close:move( 0, verticalMoveSpeed * dt ) end
+	if input:down( 'rotateLeft' ) then Close:rotate( math.pi / 2 * dt ) end
+	if input:down( 'rotateRight' ) then Close:rotate( -math.pi / 2 * dt ) end
+	if input:pressed( 'zoomIn' ) then Close:zoom( 2 )
+    elseif input:pressed( 'zoomOut' ) then Close:zoom( 1/2 ) end
 
-	if input:pressed( 'zoomIn' ) then
-		Close:zoom( 2 )
-	elseif input:pressed( 'zoomOut' ) then
-		Close:zoom( 1/2 )
-	end
+    Close:updateShake( dt )
+    Close:postUpdate()
+
+    Overview:update( dt )
 
 	if input:down( 'makeSquare' ) then
 		local mouseX, mouseY = love.mouse.getPosition()

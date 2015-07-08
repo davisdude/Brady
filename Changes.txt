@@ -1,3 +1,10 @@
+0.3.2 ----------------------- NOT COMMITTED YET
+====
+- Added Camera:shake
+- Camera:updateShake
+- Camera:removeShake
+- Updated demo
+
 0.3.1
 ====
 - Fixed Camera:adjustScale

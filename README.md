@@ -5,6 +5,7 @@ A camera library with parallax scrolling for LÖVE.
 
 #Table of Contents
 - [Usage](#usage)
+- [Name](#name)
 - [Functions](#functions)
 	- [Camera.new](#cameranew)
 	- [Camera:push](#camerapush)
@@ -68,7 +69,7 @@ And that's it!
 - Brady is named after Matthew Brady, famous American Civil War photographer. I thought it would be fitting if the camera library would be named after a famous person who used a camera.
 
 ##Functions
-####Camera.new
+###Camera.new
 - Creates a new camera object.
 - Synopsis:
 	- `Cam = Camera.new( screenX, screenY, width, height )`
@@ -81,17 +82,17 @@ And that's it!
 - Notes: 
 	- By default, the camera has one layer: main. This layer is automatically drawn and done by default and acts just like any other layer.
 
-####Camera:push
+###Camera:push
 - Push the graphics to prepare for the camera.
 - Synopses:
-	- `Camera.push( Cam )
+	- `Camera.push( Cam )`
 	- `Cam:push()`
 - Arguments: 
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 - Returns: 
 	- Nothing.
 
-####Camera:pop
+###Camera:pop
 - Pops the graphics to close-out the camera.
 - Synopses: 
 	- `Camera.pop( Cam )`
@@ -101,7 +102,7 @@ And that's it!
 - Returns
 	- Nothing.
 
-####Camera:draw
+###Camera:draw
 - Adds manual z-ordering so you don't have to worry about it.
 - Synopses:
 	- `Camera.draw( Cam )`
@@ -111,7 +112,7 @@ And that's it!
 - Returns: 
 	- Nothing.
 
-####Camera:setWorld
+###Camera:setWorld
 - Set world boundaries (AABB) required for certain functions.
 - Synopses:
 	- `World = Camera.setWorld( Cam, x, y, width, height )`
@@ -123,7 +124,7 @@ And that's it!
 - Returns: 
 	- `World`: Table. A table with the world's information (`{ x = x, y, = y, width = width, height = height }`)
 
-####World Functions
+###World Functions
 - These functions require a world to be set using [Camera:setWorld](#camerasetworld).
 
 #####Camera:adjustScale
@@ -146,7 +147,7 @@ And that's it!
 - Returns: 
 	- Nothing.
 
-####Camera:addLayer
+###Camera:addLayer
 - Adds a layer to the camera. Layers are used for parallax scrolling.
 - Synopses: 
 	- `Layer = Camera.addLayer( Cam, name, scale )`
@@ -166,7 +167,7 @@ layer:push()
 layer:pop()
 ```
 
-####Camera:getLayer
+###Camera:getLayer
 - Get the layer of a camera given the name.
 - Synopses: 
 	- `Layer = Camera.getLayer( Cam, name )`
@@ -177,7 +178,7 @@ layer:pop()
 - Returns
 	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddlayer).
 
-####Layers
+###Layers
 - These are used for parallax scrolling. By default, a layer called `'main'` is created with relative scale of 1. This is actually where things not in other layers are drawn.
 
 #####Layer:push
@@ -242,7 +243,7 @@ layer:pop()
 - Returns:
 	- `drawFunction`: Function. The function used by [Camera:draw].
 
-####Camera:move
+###Camera:move
 - Move the camera by a certain amount.
 - Synopses:
 	- `Camera.move( Cam, distanceX, distanceY )`
@@ -253,7 +254,7 @@ layer:pop()
 - Returns: 
 	- Nothing.
 
-####Camera:moveTo
+###Camera:moveTo
 - Move the camera's __center__ to a specific point.
 - Synopses:
 	- `Camera.moveTo( Cam, [x, y] )`
@@ -262,7 +263,7 @@ layer:pop()
 	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
 	- `x`, `y`: Number. The center position for the camera. Defaults as 0, 0.
 
-####Camera:zoom
+###Camera:zoom
 - Zooms the camera (increases/decreases the scale).
 - Synopses: 
 	- `Camera:zoom( Cam, [xFactor, yFactor] )`
@@ -276,7 +277,7 @@ layer:pop()
 - Notes:
 	- To clarify, this means if you have the scale at 2, 2 and to `Cam:zoom( 4, 4 )`, the scale becomes 8, 8.
 
-####Camera:zoomTo
+###Camera:zoomTo
 - Sets the camera's zoom.
 - Synopses: 
 	- `Camera.zoomTo( Cam, [scaleX, scaleY] )`
@@ -288,7 +289,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Camera:increaseZoom
+###Camera:increaseZoom
 - Increase/decrease the zoom by a certain amount. Useful for smooth zooming using `dt`.
 - Synopses: 
 	- `Camera.increaseZoom( Cam, xFactor, [yFactor] )`
@@ -300,7 +301,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Camera:rotate
+###Camera:rotate
 - Increase the rotation by a certain amount.
 - Synopses: 
 	- `Camera.rotate( Cam, rotation )`
@@ -311,7 +312,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Camera:rotateTo
+###Camera:rotateTo
 - Set the rotation of the camera.
 - Synopses: 
 	- `Camera.rotateTo( Cam, rotation )`
@@ -322,7 +323,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Camera:getWindow
+###Camera:getWindow
 - Returns the screen location (window) of the camera.
 - Synopses: 
 	- `Camera.getWindow( Cam )`
@@ -333,7 +334,7 @@ layer:pop()
 	- `x`, `y`: Numbers. The x and y location of the camera on the screen.
 	- `width`, `height`: Numbers. The width and height of the camera on the screen.
 
-####Camera:getVisible
+###Camera:getVisible
 - Returns the location of the camera within the world.
 - Synopses: 
 	- `Camera.getVisible( Cam )`
@@ -344,7 +345,7 @@ layer:pop()
 	- `x`, `y`:` Numbers. The x and y location of the camera within the world.
 	- `width`, `height`: Numbers. The width and height of the camera within the world (this __does__ account for scaling).
 
-####Camera:toWorldCoordinates
+###Camera:toWorldCoordinates
 - Convert screen coordinates to the location within the world (from the Camera's perspective).
 - Synopses: 
 	- `Camera.toWorldCoordinates( Cam, x, y, [layer] )`
@@ -356,7 +357,7 @@ layer:pop()
 - Returns:
 	- `x`, `y`: Numbers. The x and y locations to the world.
 
-####Camera:toScreenCoordinates
+###Camera:toScreenCoordinates
 - Convert world coordinates to the location on the screen.
 - Synopses: 
 	- `Camera.toScreenCoordinates( Cam, x, y, [layer] )`
@@ -368,7 +369,7 @@ layer:pop()
 - Returns:
 	- `x`, `y`: Nubmers. The x and y locations from the world to the screen.
 
-####Camera:getPoints
+###Camera:getPoints
 - Get the points of the camera. 
 - Synopses: 
 	- `Camera.getPoints( Cam )`
@@ -378,7 +379,7 @@ layer:pop()
 - Returns:
 	- `x1`, `y1`, `x2`, `y2`, `x3`, `y3`, `x4`, `y4`: Numbers. The points of the camera.
 
-####Camera:getStencil
+###Camera:getStencil
 - Get the stencil for drawing the camera.
 - Synopses: 
 	- `Camera.getStencil( Cam )`
@@ -388,7 +389,7 @@ layer:pop()
 - Returns:
 	- `stencil`: Function. The drawing function for the camera.
 
-####Camera:setStencil
+###Camera:setStencil
 - Set the stencil for drawing the camera.
 - Synopses: 
 	- `Camera.setStencil( Cam, func )`
@@ -399,7 +400,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Camera:getShape
+###Camera:getShape
 - Get the shape of the camera.
 - Synopses: 
 	- `Camera.getShape( Cam )`
@@ -412,7 +413,7 @@ layer:pop()
 		- 4 points means the camera is a rectangle (x, y, w, h).
 		- Even number > 5 means the camera is a polygon (x1, y1, x2, y2, ...).
 
-####Camera:setShape
+###Camera:setShape
 - Set the shape of the camera.
 - Synopses: 
 	- `Camera.setShape( Cam, points )`
@@ -426,7 +427,7 @@ layer:pop()
 - Returns:
 	- Nothing.
 
-####Aliases
+###Aliases
 - These functions are also available, and work just like their counterpart.
 
 | Alias			| Corresponding Function		|
