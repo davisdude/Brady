@@ -96,15 +96,16 @@ function Camera.new( x, y, width, height )
 		scaleX = 1, scaleY = 1,
 		offsetX = width / 2, offsetY = height / 2,
 		rotation = 0,
-        shakeID = 0,
-        shakes = {},
-        -- maxShakeMagnitude 
 		drawStencil = function( self )
 			love.graphics.rectangle( 'fill', self.screenX, self.screenY, self.width, self.height )
 		end,
 		shape = {}, -- Use these for custom screen shapes
 		layers = {},
 		zOrdered = {},
+        shakeID = 0,
+        shakes = {},
+        maxShakeMagnitude = 20,
+        components = {},
 	}
 
 	setmetatable( new, Camera )
@@ -113,6 +114,7 @@ function Camera.new( x, y, width, height )
 	return new
 end
 
+-- {{{
 function Camera:addLayer( name, scale )
 	err( 'addLayer: Layer name must be string or number, got %type%.', name, 'string', 'number' )
 	err( 'addLayer: Layer scale must be number, got %type%.', scale, 'number' )
@@ -163,10 +165,10 @@ end
 
 function Camera:update( dt )
     self:preUpdate()
-    self:move( self:updateShake( dt ) )
+    self:updateShake( dt )
     self:postUpdate()
 end
--- {{{
+
 function Camera:postUpdate()
     self:adjustScale()
     self:adjustPosition()
@@ -342,6 +344,15 @@ function Camera:getPoints()
 	return getCameraPoints( self )
 end
 
+function Camera:getMaxShakeMagnitude()
+    return self.maxShakeMagnitude
+end
+
+function Camera:setMaxShakeMagnitude( magnitude )
+    err( 'setMaxShakeMagnitude: magnitude must be a number, got %type%.', magnitude, 'number' )
+    self.maxShakeMagnitude = magnitude
+end
+
 function Camera:getStencil()
 	return self.drawStencil
 end
@@ -441,13 +452,17 @@ function Camera:updateShake( dt )
             self:removeShake( shake.id )
         end
     end
+    intensity[1] = math.min( intensity[1], self.maxShakeMagnitude )
+    intensity[2] = math.min( intensity[2], self.maxShakeMagnitude )
     self:move( love.math.random( -intensity[1], intensity[1] ), love.math.random( -intensity[2], intensity[2] ) )
 end
+-- }}}
 
--- TODO: camera components
 -- Camera Components (each returns the distance the camera will be moved)
+--- Update function returns x and y position to go to. 
+function Camera:positionLock( update ) return update end
+
 --[[
-    positionLock, -- ent, fallback (for when ent dies)
     edgeSnape, -- hor drift, [vert drift], -- Needs world bounds
     cameraWindow, -- x, y, width, height, onExit{ left, right, up, down }
     lerp, -- to, time, type,
