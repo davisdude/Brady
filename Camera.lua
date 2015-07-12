@@ -459,7 +459,7 @@ end
 -- }}}
 
 -- Camera Components (each returns the distance the camera will be moved)
---- Update function returns x and y position to go to. 
+--- Update function returns x and y position to go to.
 function Camera:positionLock( update ) return update end
 
 --[[

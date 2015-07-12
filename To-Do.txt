@@ -1,0 +1,8 @@
+- Types:
+	- Cinematic: 	Pre-defined path(s)
+		- Tweening to spots
+		- Define spots to go to
+			- Distance away from current location
+			- x, y of new spot
+		- Time to go to spot
+	- Interactive: 	Dynamic behavior
