@@ -1,457 +1,201 @@
 Brady
-====
+===
 
-A camera library with parallax scrolling for LÖVE. 
+Brady is a camera library for [LOVE] that features parallax scrolling and aspect ratios.
 
-#Table of Contents
-- [Usage](#usage)
-- [Name](#name)
-- [Functions](#functions)
-	- [Camera.new](#cameranew)
-	- [Camera:push](#camerapush)
-	- [Camera:pop](#camerapop)
-	- [Camera:draw](#cameradraw)
-	- [Camera:setWorld](#camerasetworld)
-	- [World Functions](#world-functions)
-		- [Camera:adjustscale](#cameraadjustscale)
-		- [Camera:adjustposition](#cameraadjustposition)
-	- [Camera:addLayer](#cameraaddlayer)
-	- [Camera:getLayer](#cameragetlayer)
-	- [Layer](#layers)
-		- [Layer:push](#layerpush)
-		- [Layer:pop](#layerpop)
-		- [Layer:setRelativeScale](#layersetrelativescale)
-		- [Layer:getRelativeScale](#layergetrelativescale)
-		- [Layer:setDrawFunction](#layersetdrawfunction)
-		- [Layer:getDrawFunction](#layergetdrawfunction)
-	- [Camera:move](#cameramove)
-	- [Camera:moveTo](#cameramoveto)
-	- [Camera:zoom](#camerazoom)
-	- [Camera:zoomTo](#camerazoomto)
-	- [Camera:increaseZoom](#cameraincreasezoom)
-	- [Camera:rotate](#camerarotate)
-	- [Camera:getWindow](#cameragetwindow)
-	- [Camera:getVisible](#cameragetvisible)
-	- [Camera:toWorldCoordinates](#cameratoworldcoordinates)
-	- [Camera:toScreenCoordinates](#cameratoscreencoordinates)
-	- [Camera:getPoints](#cameragetpoints)
-	- [Camera:getStencil](#cameragetstencil)
-	- [Camera:setStencil](#camerasetstencil)
-	- [Camera:getShape](#cameragetshape)
-	- [Camera:setShape](#camerasetshape)
-	- [Aliases](#aliases)
-- [Examples](#examples)
-- [License](#license)
+Minimal Example
+---
 
-##Usage
-```Lua
-local Camera = require 'Path.to.camera'
+Below is a minimal example of using the module. In the repository, you will find a more advanced example/demo [here](#demo)
+
+```lua
+local Camera = require 'Camera'
 
 function love.load()
-	Cam = Camera.new( 64, 64, 800 - 64 * 2, 600 - 64 * 2 )
-	-- This creates a camera that appears on the screen's x and y of 64, 64 and is 800 - 64 * 2 width, and etc.
-	Cam:setPosition( 400, 300 ) -- This sets the camera's center at 400, 600.
+	-- Create a camera with a 'width' of 400 x 300 on screen at ( 32, 32 ).
+	-- Because the camera has the flags 'resizable' and 'maintainAspectRatio', the default scaling will take over
+	-- So everything draw will be scaled up to maximize space within the window, with a 32 pixel buffer from each edge.
+	cam = Camera( 400, 300, { x = 32, y = 32, resizable = true, maintainAspectRatio = true } )
 end
 
-local function drawWorld()
-	love.graphics.rectangle( 'fill', 32, 32, 32, 32 )
+function love.update( dt )
+	cam:update() -- Needed to appropriately resize the camera
 end
 
-function love.load()
-	Cam:push()
-		drawWorld()
-	Cam:pop()
+function love.draw()
+	cam:push()
+		-- By default, translation is half camera width, half camera height
+		-- So this draws a rectangle at the center of the screen.
+		love.graphics.rectangle( 'fill', -32, -32, 64, 64 )
+	cam:pop()
 end
 ```
-And that's it! 
 
-##Name
-- Brady is named after Matthew Brady, famous American Civil War photographer. I thought it would be fitting if the camera library would be named after a famous person who used a camera.
+Demo
+---
 
-##Functions
-###Camera.new
-- Creates a new camera object.
-- Synopsis:
-	- `Cam = Camera.new( screenX, screenY, width, height )`
-	- `Cam = Camera( screenX, screenY, width, height )`
-- Arguments: 
-	- `screenX`, `screenY`: Numbers. The x and y coordinates for where the camera will be on the screen.
-	- `width`, `height`: Numbers. The width and height of the camera at the scale of 1, as well as the size it occupies on the screen.
-- Returns: 
-	- `Cam`: Table. A camera object.
-- Notes: 
-	- By default, the camera has one layer: main. This layer is automatically drawn and done by default and acts just like any other layer.
+Within the repo is a demo to show off some of the capabilities. To run, follow the instructions found [here](https://love2d.org/wiki/Game_Distribution#Create_a_.love-file). In the demo, the left box shows a close-up view, the right box shows an overview. Use the mouse to create squares using either box. With the mousewheel you can zoom in and out and you can move around using the `wasd` keys and rotate with `q` and `e`. To reset the view, press `o` (for origin). To clear the squares, press `c`, and to reset everything, press `r`.
 
-###Camera:push
-- Push the graphics to prepare for the camera.
-- Synopses:
-	- `Camera.push( Cam )`
-	- `Cam:push()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns: 
-	- Nothing.
+Gotchas
+---
 
-###Camera:pop
-- Pops the graphics to close-out the camera.
-- Synopses: 
-	- `Camera.pop( Cam )`
-	- `Cam:pop()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns
-	- Nothing.
+- Every camera has a layer called `'main'` automatically created. This layer has the same scale as the camera and is used simply to distinguish the layers.
+- Layers can have an attribute known as the "relativeScale". This value is used to control how fast the layer moves, relative to its scale. For instance, if the layer has a scale of 2 and a relativeScale of .5, it will move at the same speed as the main layer, but will appear twice as large. See [cam:addLayer](#cam-addlayer) for more.
+- `cam.scale` is a number, __not__ a function. Use [cam:scaleBy](#cam-scaleby) instead.
 
-###Camera:draw
-- Adds manual z-ordering so you don't have to worry about it.
-- Synopses:
-	- `Camera.draw( Cam )`
-	- `Cam:draw()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns: 
-	- Nothing.
+Functions
+---
 
-###Camera:setWorld
-- Set world boundaries (AABB) required for certain functions.
-- Synopses:
-	- `World = Camera.setWorld( Cam, x, y, width, height )`
-	- `World = Cam:setWorld( x, y, width, height )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `x`, `y`: Numbers. The top left x and y coordinates for the world.
-	- `width`, `height`: Numbers. The width and height of the world. 
-- Returns: 
-	- `World`: Table. A table with the world's information (`{ x = x, y, = y, width = width, height = height }`)
+### Camera.newCamera
 
-###World Functions
-- These functions require a world to be set using [Camera:setWorld](#camerasetworld).
+Creates a new camera object.
 
-#####Camera:adjustScale
-- Put this inside of love.update in order to keep the camera scaled within the world coordinates. This does __not__ acount for position, for that see [Camera:adjustPosition](#cameraadjustposition).
-- Synopses:
-	- `Camera.adjustScale( Cam )`
-	- `Cam:adjustScale()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns: 
-	- Nothing.
+__Synopsis__: `cam = Camera.newCamera( w, h, flags )` or `cam = Camera( w, h, flags )`
 
-#####Camera:adjustPosition
-- Put this inside of love.update in order to keep the camera positioned within the world (i.e. you can't see outside of the world boundaries). This does __not__ account for scaling (and frankly, doesn't really work without bound-scaling), for that, see [Camera:adjustScale](#cameraadjustscale).
-- Synopses:
-	- `Camera.adjustPosition( Cam )`
-	- `Cam:adjustPosition()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns: 
-	- Nothing.
+- `cam`: Table. A new camera object.
+- `w, h`: Numbers. The width/height of the camera. If the flags `resizable` and `maintainAspectRatio` are set, these are used to determine the scaling needed. Otherwise, it sets the camera to this size.
+- `flags`: Table. These allow you to set some of the options of the camera without using getter/setter methods. Possible flags are:
 
-###Camera:addLayer
-- Adds a layer to the camera. Layers are used for parallax scrolling.
-- Synopses: 
-	- `Layer = Camera.addLayer( Cam, name, scale )`
-	- `Layer = Cam:addLayer( name, scale )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `name`: String. The name the camera will be referred to by.
-	- `scale`: Number. The amount by which you increase/decrease the scale.
-- Returns: 
-	- Layer`: Table. The layer information that is drawn.
-```Lua
-layer = Cam:addLayer( 'testLayer', .5 )
+	- `x, y`: _Numbers_ (Default to `0, 0`). The position of the camera on the screen.
+	- `translationX, translationY`: Numbers (Defaults to `0, 0`). The translation of the camera.
+	- `offsetX, offsetY`: _Numbers_ (Default to `w / 2, h / 2). The amount to offset the camera.
+	- `scale`: _Number_ (Defaults to `1`). The scale of the camera.
+	- `rotation`: _Number_ (Defaults to `0`). The rotation of the camera.
+	- `resizable`: _Boolean_ (Defaults to `false`). `true` if the camera can be resized, `false` if it cannot.
+	- `maintainAspectRatio`: _Boolean_ (Defaults to `false`). `true` if the initial aspect ratio should be maintained, false if it shouldn't.
+	- `mode`: _String_ (Defaults to `'transform'`). The [StackType] to use for `push`ing and `pop`ing the camera.
+	- `update`: _Function_. The function called every frame used to control scaling and size. By default, if the camera is resizable, the resizing function is called, passing itself and the results of `cam:getContainerDimensions`.
+	- `resizingFunction`: _Function_. Only called if the `resizable` flag is true. Used to set the width and height of the camera, as well as any other changes due to resizing. By default, the function changes the `aspectRatioScale`, `offsetX` and `offsetY`, `w`, and `h` of the camera and takes the parameters `self`, `containerW`, and `containerH`.
+	- `getContainerDimensions`: _Function_. By default, it returns the width and height of the screen.
 
--- Drawing
-layer:push()
-	...
-layer:pop()
-```
+### cam:push
 
-###Camera:getLayer
-- Get the layer of a camera given the name.
-- Synopses: 
-	- `Layer = Camera.getLayer( Cam, name )`
-	- `Layer = Cam:getLayer( name )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `name`: String. The name passed in [Camera:addLayer](#cameraaddlayer).
-- Returns
-	- `Layer`: Table. A layer object also returned when created by [Camera:addLayer](#cameraaddlayer).
+Prepare the draw area. Pseudonym for [layer:push](#layer-push).
 
-###Layers
-- These are used for parallax scrolling. By default, a layer called `'main'` is created with relative scale of 1. This is actually where things not in other layers are drawn.
+__Synopsis__: `cam:push( layer )`
 
-#####Layer:push
-- Similar to [Camera:push](#camerapush), but acts as the push for the layer.
-- Synopses:
-	- `Layer.push( Layer )`
-	- `Layer:push()`
-- Arguments: 
-	- `layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-- Returns:
-	- Nothing.
+- `layer`: `nil`, _String_, or _table_ (Defaults to `'main'`, a layer that is automatically created). The name of the layer (as specified in [cam:addLayer](#cam-addlayer)) __or__ the layer, as returned by [cam:addLayer](#cam-addlayer).
 
-#####Layer:pop
-- Similar to [Camera:pop](#camerapop), but acts as the pop for the layer.
-- Synopses:
-	- `Layer.pop( Layer )`
-	- `Layer:pop()`
-- Arguments: 
-	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-- Returns:
-	- Nothing.
+### cam:pop
 
-#####Layer:setRelativeScale
-- Sets the amount that the layer is scaled by. For example, 2 would make everything larger.
-- Synopses:
-	- `Layer.setRelativeScale( Layer, scale )`
-	- `Layer:setRelativeScale( scale )`
-- Arguments: 
-	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-	- `scale`: Number. The amount by which the layer should increase the scaling.
-- Returns:
-	- Nothing.
+Used to stop the camera scaling, etc. Pseudonym for [layer:pop](#layer-pop).
 
-#####Layer:getRelativeScale
-- Gets the amount that the layer is scaled by.
-- Synopses:
-	- `relativeScale = Layer.getRelativeScale( Layer )`
-	- `relativeScale = Layer:getRelativeScale()`
-- Arguments: 
-	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-- Returns:
-	- `relativeScale`: Number. The relative scale of the layer.
+__Synopsis__: `cam:pop( layer )`
 
-#####Layer:setDrawFunction
-- Sets the draw function to be used if you're using [Camera:draw](#cameradraw).
-- Synopses:
-	- `Layer.setDrawFunction( Layer, func )`
-	- `Layer:push( func )`
-- Arguments: 
-	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-	- `func`: Function. The function that is called when being drawn.
-- Returns:
-	- Nothing.
+- `layer`: `nil`, _String_, or _table_. See [cam:push](#cam-push) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop], so specifying the layer isn't requried unless you want to.
 
-#####Layer:getDrawFunction
-- Gets the draw function used by [Camera:draw](#cameradraw).
-- Synopses:
-	- `drawFunction = Layer.getDrawFunction( Layer )`
-	- `drawFunction = Layer:getDrawFunction()`
-- Arguments: 
-	- `Layer`: Table. A layer object returned by [Camera:addLayer](#cameraaddlayer) or [Camera:getLayer](#cameragetlayer).
-- Returns:
-	- `drawFunction`: Function. The function used by [Camera:draw].
+### cam:toWorldCoordinates
 
-###Camera:move
-- Move the camera by a certain amount.
-- Synopses:
-	- `Camera.move( Cam, distanceX, distanceY )`
-	- `Cam:move( distanceX, distanceY )`
-- Arguments:
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `distanceX`, `distanceY`: Numbers. The distance to move the camera horizontally and vertically.
-- Returns: 
-	- Nothing.
+Returns the position within the "world," i.e. what the camera is seeing. Translates mouse coordinates to in-game coordinates.
 
-###Camera:moveTo
-- Move the camera's __center__ to a specific point.
-- Synopses:
-	- `Camera.moveTo( Cam, [x, y] )`
-	- `Cam:moveTo( [x, y] )`
-- Arguments:
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `x`, `y`: Number. The center position for the camera. Defaults as 0, 0.
+__Synopsis__: `worldX, worldY = cam:toWorldCoordinates( screenX, screenY )`
 
-###Camera:zoom
-- Zooms the camera (increases/decreases the scale).
-- Synopses: 
-	- `Camera:zoom( Cam, [xFactor, yFactor] )`
-	- `Cam:zoom( [xFactor, yFactor] )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `xFactor`: Numbers. The amount by which to increase the horizontal scale. Defaults as 1.
-	- `yFactor`: Numbers. The amount by which to increase the vertical scale. Defaults as `xFactor`.
-- Returns:
-	- Nothing.
-- Notes:
-	- To clarify, this means if you have the scale at 2, 2 and to `Cam:zoom( 4, 4 )`, the scale becomes 8, 8.
+- `worldX, worldY`: Numbers. The word-coordinates of the mouse.
+- `screenX, screenY`: The coordinates on-screen, i.e. the mouse usually.
 
-###Camera:zoomTo
-- Sets the camera's zoom.
-- Synopses: 
-	- `Camera.zoomTo( Cam, [scaleX, scaleY] )`
-	- `Cam:zoomTo( [scaleX, scaleY] )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `scaleX`: Number. The horizontal scale. Defaults to 1.
-	- `scaleY`: Number. The vertical scale. Defaults to `scaleX`.
-- Returns:
-	- Nothing.
+### cam:toScreenCoordinates
 
-###Camera:increaseZoom
-- Increase/decrease the zoom by a certain amount. Useful for smooth zooming using `dt`.
-- Synopses: 
-	- `Camera.increaseZoom( Cam, xFactor, [yFactor] )`
-	- `Cam:increaseZoom( xFactor, [yFactor] )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `xFactor`: Number. The amount by which to increase the horizontal scale.
-	- `yFactir`: Number. The amount by which to increase the vertical scale. Defaults to `xFactor`.
-- Returns:
-	- Nothing.
+Translates in-game coordinates to the screen. The opposite of [cam:toWorldCoordinates](#cam-toworldcoordinates).
 
-###Camera:rotate
-- Increase the rotation by a certain amount.
-- Synopses: 
-	- `Camera.rotate( Cam, rotation )`
-	- `Cam:rotate( rotation )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `rotation`: Number. The amount by which to increase the rotation.
-- Returns:
-	- Nothing.
+__Synopsis__: `screenX, screenY = cam:toWorldCoordinates( worldX, worldY )`
 
-###Camera:rotateTo
-- Set the rotation of the camera.
-- Synopses: 
-	- `Camera.rotateTo( Cam, rotation )`
-	- `Cam:rotateTo( rotation )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `rotation`: Number. The number (in radians) to set the rotation of the camera to.
-- Returns:
-	- Nothing.
+- `screenX, screenY`: The coordinates on-screen, i.e. the mouse usually.
+- `worldX, worldY`: Numbers. The word-coordinates of the mouse.
 
-###Camera:getWindow
-- Returns the screen location (window) of the camera.
-- Synopses: 
-	- `Camera.getWindow( Cam )`
-	- `Cam:getWindow`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns:
-	- `x`, `y`: Numbers. The x and y location of the camera on the screen.
-	- `width`, `height`: Numbers. The width and height of the camera on the screen.
+### cam:setViewportPosition
 
-###Camera:getVisible
-- Returns the location of the camera within the world.
-- Synopses: 
-	- `Camera.getVisible( Cam )`
-	- `Cam:getVisible()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns:
-	- `x`, `y`:` Numbers. The x and y location of the camera within the world.
-	- `width`, `height`: Numbers. The width and height of the camera within the world (this __does__ account for scaling).
+Set the x and y position of the camera's upper-left corner on-screen. Wrapper function for `cam.x, cam.y = -- etc`.
 
-###Camera:toWorldCoordinates
-- Convert screen coordinates to the location within the world (from the Camera's perspective).
-- Synopses: 
-	- `Camera.toWorldCoordinates( Cam, x, y, [layer] )`
-	- `Cam:toWorldCoordinates( x, y, [layer] )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `x`, `y`: Numbers. The screen x and y coordinates to be converted to the world.
-	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddlayer). Defaults to `'main'`.
-- Returns:
-	- `x`, `y`: Numbers. The x and y locations to the world.
+__Synopsis__: `cam:setViewportPosition( x, y )`
 
-###Camera:toScreenCoordinates
-- Convert world coordinates to the location on the screen.
-- Synopses: 
-	- `Camera.toScreenCoordinates( Cam, x, y, [layer] )`
-	- `Cam:toScreenCoordinates( x, y, [layer] )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `x`, `y`: Numbers. The x and y screen coordinates.
-	- `layer`: String. The name passed by [Camera.addLayer](#cameraaddlayer). Defaults to `'main'`.
-- Returns:
-	- `x`, `y`: Nubmers. The x and y locations from the world to the screen.
+- `x, y`: The upper-left corner of the camera.
 
-###Camera:getPoints
-- Get the points of the camera. 
-- Synopses: 
-	- `Camera.getPoints( Cam )`
-	- `Cam:getPoints()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns:
-	- `x1`, `y1`, `x2`, `y2`, `x3`, `y3`, `x4`, `y4`: Numbers. The points of the camera.
+### cam:getViewportPosition
 
-###Camera:getStencil
-- Get the stencil for drawing the camera.
-- Synopses: 
-	- `Camera.getStencil( Cam )`
-	- `Cam:getStencil()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns:
-	- `stencil`: Function. The drawing function for the camera.
+Returns the upper-left x and y position of the camera.
 
-###Camera:setStencil
-- Set the stencil for drawing the camera.
-- Synopses: 
-	- `Camera.setStencil( Cam, func )`
-	- `Cam:setStencil( func )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `func`: Function. The function for drawing the camera.
-- Returns:
-	- Nothing.
+__Synopsis__: `x, y = cam:getViewportPosition()`
 
-###Camera:getShape
-- Get the shape of the camera.
-- Synopses: 
-	- `Camera.getShape( Cam )`
-	- `Cam:getShape()`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-- Returns:
-	- `points`: Table. The points for drawing the camera's shape.
-		- 3 points means the camera is circular (x, y, r).
-		- 4 points means the camera is a rectangle (x, y, w, h).
-		- Even number > 5 means the camera is a polygon (x1, y1, x2, y2, ...).
+- `x, y`: The upper-left corner of the camera.
 
-###Camera:setShape
-- Set the shape of the camera.
-- Synopses: 
-	- `Camera.setShape( Cam, points )`
-	- `Cam:setShape( ... )`
-- Arguments: 
-	- `Cam`: Table. A camera object returned by [Camera.new](#cameranew).
-	- `points`: Table. A table containing the points to be used for drawing the camera.
-		- 3 points means the camera is circular (x, y, r).
-		- 4 points means the camera is a rectangle (x, y, w, h).
-		- Even number > 5 means the camera is a polygon (x1, y1, x2, y2, ...).
-- Returns:
-	- Nothing.
+### cam:setTranslation
 
-###Aliases
-- These functions are also available, and work just like their counterpart.
+### cam:getTranslation
 
-| Alias			| Corresponding Function		|
-| -------------	|:-----------------------------:|
-| setPosition	| [moveTo](#cameramoveto)		|
-| setCenter		| [moveTo](#cameramoveto)		|
-| setZoom		| [zoomTo](#camerazoomto)		|
-| setRotation	| [rotateTo](#camerarotateto)	|
+### cam:increaseTranslation
 
-##Examples
-See [Examples](https://github.com/davisdude/Brady/tree/master/Examples/).
+Get/set/increase the translation.
 
-##License
-A camera library with parallax scrolling for LÖVE.
-Copyright (C) 2015 Davis Claiborne
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-Contact me at davisclaib at gmail.com
+### cam:translate
+
+Synonymous with [cam:increaseTranslation](#cam-increasetranslation)
+
+### cam:setRotation
+
+### cam:getRotation
+
+### cam:increaseRotation
+
+Get/set/increase the rotation.
+
+### cam:rotate
+
+Synonymous with [cam:increaseRotation](#cam-increaseRotation)
+
+### cam:setScale
+
+### cam:getScale
+
+### cam:increaseScale
+
+Get/set/increase the scale.
+
+### cam:scaleBy
+
+Increase the scale by a factor.
+
+__Synopsis__: `cam:scaleBy( factor )`
+
+- `factor`: _Number_. Multiply the scale by this amount. e.g. if the scale is .5 and you `scaleBy` 2, the scale is now 1.
+
+### cam:getLayer
+
+Get the specified layer.
+
+__Synopsis__: `cam:getLayer( layer )`
+
+- `layer`: _Table_ or _String_. Get the specified layer. If a table is passed, the table is returned. If a string is passed, the layer of the specified name is returned.
+
+### cam:addLayer
+
+Create a new layer for the camera.
+
+__Synopsis__: `layer = cam:addLayer( name, scale, flags )`
+
+- `name`: _String_. The name used to identify the layer.
+- `scale`: _Number_. The scale of the layer.
+- `flags`: _Table_. These allow you to specify values for the layer. Possible flags are:
+
+	- `relativeScale`: _Number_ (Defaults to `1`). The relative scale of the layer. This does __not__ affect the scale in any way; this controls how much the layer is translated. For instance, a layer with a scale of 2 and a relative scale of .5 moves at the same speed as the main layer, it is just twice the size.
+	- `mode`: _String_ (Defaults to `cam.mode`). The [StackType] of the layer.
+
+### layer:push
+
+Prepare for the layer's translations.
+
+__Synopsis__: `layer:push()`
+
+### layer:pop
+
+Ends the layer's translations. By default, it's only [love.graphics.pop].
+
+__Synopsis__: `layer:pop()`
+
+[LOVE]: https://love2d.org
+[StackType]: https://love2d.org/wiki/StackType
+[love.graphcis.pop]: https://love2d.org/wiki/love.graphics.pop
+
+License
+---
+
+This is under the MIT license, which can be found at the top of [camera.lua](#camera.lua)
