@@ -14,7 +14,7 @@ local Camera = require 'Camera'
 function love.load()
 	-- Create a camera with a 'width' of 400 x 300 on screen at ( 32, 32 ).
 	-- Because the camera has the flags 'resizable' and 'maintainAspectRatio', the default scaling will take over
-	-- So everything draw will be scaled up to maximize space within the window, with a 32 pixel buffer from each edge.
+	-- So everything drawn will be scaled up to maximize space within the window, with a 32 pixel buffer from each edge.
 	cam = Camera( 400, 300, { x = 32, y = 32, resizable = true, maintainAspectRatio = true } )
 end
 
@@ -40,8 +40,8 @@ Gotchas
 ---
 
 - Every camera has a layer called `'main'` automatically created. This layer has the same scale as the camera and is used simply to distinguish the layers.
-- Layers can have an attribute known as the "relativeScale". This value is used to control how fast the layer moves, relative to its scale. For instance, if the layer has a scale of 2 and a relativeScale of .5, it will move at the same speed as the main layer, but will appear twice as large. See [cam:addLayer](#cam-addlayer) for more.
-- `cam.scale` is a number, __not__ a function. Use [cam:scaleBy](#cam-scaleby) instead.
+- Layers can have an attribute known as the "relativeScale". This value is used to control how fast the layer moves, relative to its scale. For instance, if the layer has a scale of 2 and a relativeScale of .5, it will move at the same speed as the main layer, but will appear twice as large. See [cam:addLayer](#camaddlayer) for more.
+- `cam.scale` is a number, __not__ a function. Use [cam:scaleBy](#camscaleby) instead.
 
 Functions
 ---
@@ -74,7 +74,7 @@ Prepare the draw area. Pseudonym for [layer:push](#layer-push).
 
 __Synopsis__: `cam:push( layer )`
 
-- `layer`: `nil`, _String_, or _table_ (Defaults to `'main'`, a layer that is automatically created). The name of the layer (as specified in [cam:addLayer](#cam-addlayer)) __or__ the layer, as returned by [cam:addLayer](#cam-addlayer).
+- `layer`: `nil`, _String_, or _table_ (Defaults to `'main'`, a layer that is automatically created). The name of the layer (as specified in [cam:addLayer](#camaddlayer)) __or__ the layer, as returned by [cam:addLayer](#camaddlayer).
 
 ### cam:pop
 
@@ -82,7 +82,7 @@ Used to stop the camera scaling, etc. Pseudonym for [layer:pop](#layer-pop).
 
 __Synopsis__: `cam:pop( layer )`
 
-- `layer`: `nil`, _String_, or _table_. See [cam:push](#cam-push) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop], so specifying the layer isn't requried unless you want to.
+- `layer`: `nil`, _String_, or _table_. See [cam:push](#campush) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop], so specifying the layer isn't requried unless you want to.
 
 ### cam:toWorldCoordinates
 
@@ -95,7 +95,7 @@ __Synopsis__: `worldX, worldY = cam:toWorldCoordinates( screenX, screenY )`
 
 ### cam:toScreenCoordinates
 
-Translates in-game coordinates to the screen. The opposite of [cam:toWorldCoordinates](#cam-toworldcoordinates).
+Translates in-game coordinates to the screen. The opposite of [cam:toWorldCoordinates](#camtoworldcoordinates).
 
 __Synopsis__: `screenX, screenY = cam:toWorldCoordinates( worldX, worldY )`
 
@@ -128,7 +128,7 @@ Get/set/increase the translation.
 
 ### cam:translate
 
-Synonymous with [cam:increaseTranslation](#cam-increasetranslation)
+Synonymous with [cam:increaseTranslation](#camincreasetranslation)
 
 ### cam:setRotation
 
@@ -140,7 +140,7 @@ Get/set/increase the rotation.
 
 ### cam:rotate
 
-Synonymous with [cam:increaseRotation](#cam-increaseRotation)
+Synonymous with [cam:increaseRotation](#camincreaseRotation)
 
 ### cam:setScale
 
@@ -198,4 +198,4 @@ __Synopsis__: `layer:pop()`
 License
 ---
 
-This is under the MIT license, which can be found at the top of [camera.lua](#camera.lua)
+This is under the MIT license, which can be found at the top of [camera.lua](/camera.lua)
