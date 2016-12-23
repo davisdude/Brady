@@ -35,7 +35,7 @@ local function makePush( self, layer )
 		love.graphics.push( layer.mode )
 		love.graphics.origin()
 		love.graphics.translate( self.x + self.offsetX, self.y + self.offsetY )
-		love.graphics.rotate( self.rotation )
+		love.graphics.rotate( -self.rotation )
 		love.graphics.scale( self.scale * self.aspectRatioScale * layer.scale )
 		love.graphics.translate( -self.translationX * layer.relativeScale, -self.translationY * layer.relativeScale )
 	end
@@ -100,7 +100,7 @@ local function newCamera( w, h, flags )
 			layer = self:getLayer( layer or 'main' )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.x - self.offsetX, y - self.y - self.offsetY
-			x, y = rotateAboutPoint( x, y, 0, 0, -self.rotation )
+			x, y = rotateAboutPoint( x, y, 0, 0, self.rotation )
 			x, y = x / scaleFactor, y / scaleFactor
 			return x + self.translationX * layer.relativeScale, y + self.translationY * layer.relativeScale
 		end,
@@ -109,13 +109,15 @@ local function newCamera( w, h, flags )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.translationX / layer.relativeScale, y - self.translationY * layer.relativeScale
 			x, y = x * scaleFactor, y * scaleFactor
-			x, y = rotateAboutPoint( x, y, 0, 0, self.rotation )
+			x, y = rotateAboutPoint( x, y, 0, 0, -self.rotation )
 			x, y = x + self.x + self.offsetX, y + self.y + self.offsetY
 			return x, y
 		end,
 		-- Getters/setters
 		setViewportPosition = function( self, x, y ) self.x, self.y = x, y end,
 		getViewportPosition = function( self ) return self.x, self.y end,
+		setOffset = function( self, x, y ) self.offsetX, self.offsetY = x, y end,
+		getOffset = function( self ) return self.offsetX, self.offsetY end,
 		setTranslation = function( self, x, y ) self.translationX, self.translationY = x or 0, y or 0 end,
 		getTranslation = function( self ) return self.translationX, self.translationY end,
 		increaseTranslation = function( self, dx, dy ) self.translationX, self.translationY = self.translationX + dx, self.translationY + dy end,
@@ -130,16 +132,11 @@ local function newCamera( w, h, flags )
 	new.translate = new.increaseTranslation
 	new.rotate = new.increaseRotation
 
-	addLayer( new, 'main', 1 )
 	mixin( new, flags )
+	addLayer( new, 'main', 1 )
 
 	return new
 end
 
 
-return setmetatable(
-	{
-		new = newCamera,
-	},
-	{ __call = function( _, ... ) return newCamera( ... ) end }
-)
+return setmetatable( { new = newCamera, }, { __call = function( _, ... ) return newCamera( ... ) end } )
