@@ -118,7 +118,21 @@ __Synopsis__: `x, y = cam:getViewportPosition()`
 
 - `x, y`: The upper-left corner of the camera.
 
+### cam:setOffset
+
+Sets the camera's offset, which, by default, is `w / 2` and `h / 2`.
+
+__Synopsis__: `cam:setOffset( x, y )`
+
+- `x, y`: The x and y offset for the camera.
+
 ### cam:setTranslation
+
+Gets the camera's offset.
+
+__Synopsis__: `x, y = cam:getOffset()`
+
+- `x, y`: The x and y offset of the camera.
 
 ### cam:getTranslation
 

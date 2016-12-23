@@ -73,8 +73,8 @@ function love.update( dt )
 	-- local _x, _y = mobileCam:toScreenCoordinates( mobileCam:toWorldCoordinates( x, y ) )
 	-- assert( x == _x and y == _y, x .. '~=' .. _x .. ', ' .. y .. '~=' .. _y )
 
-	if love.keyboard.isDown( 'q' ) then mobileCam:rotate( -math.pi * dt ) end
-	if love.keyboard.isDown( 'e' ) then mobileCam:rotate( math.pi * dt ) end
+	if love.keyboard.isDown( 'q' ) then mobileCam:rotate( math.pi * dt ) end
+	if love.keyboard.isDown( 'e' ) then mobileCam:rotate( -math.pi * dt ) end
 	if love.keyboard.isDown( 'w' ) then mobileCam:translate( 0, -moveSpeed * dt ) end
 	if love.keyboard.isDown( 's' ) then mobileCam:translate( 0, moveSpeed * dt ) end
 	if love.keyboard.isDown( 'a' ) then mobileCam:translate( -moveSpeed * dt, 0 ) end

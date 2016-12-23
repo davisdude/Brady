@@ -35,7 +35,7 @@ local function makePush( self, layer )
 		love.graphics.push( layer.mode )
 		love.graphics.origin()
 		love.graphics.translate( self.x + self.offsetX, self.y + self.offsetY )
-		love.graphics.rotate( -self.rotation )
+		love.graphics.rotate( self.rotation )
 		love.graphics.scale( self.scale * self.aspectRatioScale * layer.scale )
 		love.graphics.translate( -self.translationX * layer.relativeScale, -self.translationY * layer.relativeScale )
 	end
@@ -100,7 +100,7 @@ local function newCamera( w, h, flags )
 			layer = self:getLayer( layer or 'main' )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.x - self.offsetX, y - self.y - self.offsetY
-			x, y = rotateAboutPoint( x, y, 0, 0, self.rotation )
+			x, y = rotateAboutPoint( x, y, 0, 0, -self.rotation )
 			x, y = x / scaleFactor, y / scaleFactor
 			return x + self.translationX * layer.relativeScale, y + self.translationY * layer.relativeScale
 		end,
@@ -109,7 +109,7 @@ local function newCamera( w, h, flags )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.translationX / layer.relativeScale, y - self.translationY * layer.relativeScale
 			x, y = x * scaleFactor, y * scaleFactor
-			x, y = rotateAboutPoint( x, y, 0, 0, -self.rotation )
+			x, y = rotateAboutPoint( x, y, 0, 0, self.rotation )
 			x, y = x + self.x + self.offsetX, y + self.y + self.offsetY
 			return x, y
 		end,
