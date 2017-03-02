@@ -57,8 +57,8 @@ __Synopsis__: `cam = Camera.newCamera( w, h, flags )` or `cam = Camera( w, h, fl
 - `flags`: Table. These allow you to set some of the options of the camera without using getter/setter methods. Possible flags are:
 
 	- `x, y`: _Numbers_ (Default to `0, 0`). The position of the camera on the screen.
-	- `translationX, translationY`: Numbers (Defaults to `0, 0`). The translation of the camera.
-	- `offsetX, offsetY`: _Numbers_ (Default to `w / 2, h / 2). The amount to offset the camera.
+	- `translationX, translationY`: _Numbers_ (Defaults to `0, 0`). The translation of the camera.
+	- `offsetX, offsetY`: _Numbers_ (Default to `w / 2, h / 2`). The amount to offset the camera.
 	- `scale`: _Number_ (Defaults to `1`). The scale of the camera.
 	- `rotation`: _Number_ (Defaults to `0`). The rotation of the camera.
 	- `resizable`: _Boolean_ (Defaults to `false`). `true` if the camera can be resized, `false` if it cannot.
@@ -82,7 +82,7 @@ Used to stop the camera scaling, etc. Pseudonym for [layer:pop](#layer-pop).
 
 __Synopsis__: `cam:pop( layer )`
 
-- `layer`: `nil`, _String_, or _table_. See [cam:push](#campush) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop], so specifying the layer isn't requried unless you want to.
+- `layer`: `nil`, _String_, or _table_. See [cam:push](#campush) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop](#https://love2d.org/wiki/love.graphics.pop), so specifying the layer isn't required unless you want to for stylistic reasons.
 
 ### cam:toWorldCoordinates
 
@@ -90,8 +90,8 @@ Returns the position within the "world," i.e. what the camera is seeing. Transla
 
 __Synopsis__: `worldX, worldY = cam:toWorldCoordinates( screenX, screenY )`
 
-- `worldX, worldY`: Numbers. The word-coordinates of the mouse.
-- `screenX, screenY`: The coordinates on-screen, i.e. the mouse usually.
+- `worldX, worldY`: _Numbers_. The word-coordinates of the mouse.
+- `screenX, screenY`: _Numbers_. The coordinates on-screen, i.e. the mouse usually.
 
 ### cam:toScreenCoordinates
 
@@ -99,8 +99,17 @@ Translates in-game coordinates to the screen. The opposite of [cam:toWorldCoordi
 
 __Synopsis__: `screenX, screenY = cam:toWorldCoordinates( worldX, worldY )`
 
-- `screenX, screenY`: The coordinates on-screen, i.e. the mouse usually.
-- `worldX, worldY`: Numbers. The word-coordinates of the mouse.
+- `screenX, screenY`: _Numbers_. The coordinates on-screen, i.e. the mouse usually.
+- `worldX, worldY`: _Numbers_. The word-coordinates of the mouse.
+
+### cam:getMouseWorldCoordinates
+
+Short for `cam:toScreenCoordinates( love.mouse.getPosition() )`. See [cam:toScreenCoordinates](#camtoscreencoordinates) for more.
+
+__Synopsis__: `screenX, screenY = cam:getMouseWorldCoordinates( layer )`
+
+- `screenX, screenY`: _Numbers_. The coordinates on-screen, i.e. the mouse usually.
+- `layer`: `nil`, _String_, or _table_. See [cam:push](#campush) for a detailed description of the layer. If `nil`, the main layer is used.
 
 ### cam:setViewportPosition
 
@@ -108,7 +117,7 @@ Set the x and y position of the camera's upper-left corner on-screen. Wrapper fu
 
 __Synopsis__: `cam:setViewportPosition( x, y )`
 
-- `x, y`: The upper-left corner of the camera.
+- `x, y`: _Numbers_. The upper-left corner of the camera.
 
 ### cam:getViewportPosition
 
@@ -116,7 +125,7 @@ Returns the upper-left x and y position of the camera.
 
 __Synopsis__: `x, y = cam:getViewportPosition()`
 
-- `x, y`: The upper-left corner of the camera.
+- `x, y`: _Numbers_. The upper-left corner of the camera.
 
 ### cam:setOffset
 
@@ -124,7 +133,7 @@ Sets the camera's offset, which, by default, is `w / 2` and `h / 2`.
 
 __Synopsis__: `cam:setOffset( x, y )`
 
-- `x, y`: The x and y offset for the camera.
+- `x, y`: _Numbers_. The x and y offset for the camera.
 
 ### cam:setTranslation
 
@@ -132,7 +141,7 @@ Gets the camera's offset.
 
 __Synopsis__: `x, y = cam:getOffset()`
 
-- `x, y`: The x and y offset of the camera.
+- `x, y`: _Numbers_. The x and y offset of the camera.
 
 ### cam:getTranslation
 
@@ -172,13 +181,32 @@ __Synopsis__: `cam:scaleBy( factor )`
 
 - `factor`: _Number_. Multiply the scale by this amount. e.g. if the scale is .5 and you `scaleBy` 2, the scale is now 1.
 
+### cam:increaseScaleToPoint
+
+Increment the scale, while zooming in to a point
+
+__Synopsis__: `cam:increaseScaleToPoint( ds, wx, wy )`
+
+- `ds`: _Number_. The amount by which to increment the scale. I.e. if `scale` is _1_ and `ds` is _.1_, then new scale is _1.1_.
+- `wx, wy`: `nil` or _Numbers_. The __world__ coordinates to zoom into. If left `nil`, defaults to [`cam:getMouseWorldCoordinates()`](#camgetmouseworldcoordinates).
+
+### cam:scaleToPoint
+
+Increase the scale by a factor, while zooming to a point
+
+__Synopsis__: `cam:scaleToPoint( s, wx, wy )`
+
+- `s`: _Number_. The factor by which to increase the scale. I.e. if `scale` is _1_ and `s` is _2_, the new scale is _2_. 
+- `wx, wy`: `nil` or _Numbers_. The _world_ coordinates to zoom into. If left `nil`, defaults to [`cam:getMouseWorldCoordinates()`](#camgetmouseworldcoordinates).
+
 ### cam:getLayer
 
 Get the specified layer.
 
-__Synopsis__: `cam:getLayer( layer )`
+__Synopsis__: `layer = cam:getLayer( target )`
 
-- `layer`: _Table_ or _String_. Get the specified layer. If a table is passed, the table is returned. If a string is passed, the layer of the specified name is returned.
+- `target`: _Table_ or _String_. Get the specified layer. If a table is passed, the table is returned. If a string is passed, the layer of the specified name is returned.
+- `layer`: _Table_ or `nil`. The specified layer, or `nil` if the specified layer does not exist.
 
 ### cam:addLayer
 

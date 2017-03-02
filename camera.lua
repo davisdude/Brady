@@ -113,6 +113,29 @@ local function newCamera( w, h, flags )
 			x, y = x + self.x + self.offsetX, y + self.y + self.offsetY
 			return x, y
 		end,
+		getMouseWorldCoordinates = function( self, layer )
+			layer = self:getLayer( layer or 'main' )
+			local x, y = love.mouse.getPosition()
+			return self:toWorldCoordinates( x, y, layer )
+		end,
+		increaseScaleToPoint = function( self, ds, wx, wy )
+			if not wx then
+				wx, wy = self:getMouseWorldCoordinates()
+			end
+
+			local tx, ty = self:getTranslation()
+			self:increaseScale( ds )
+			self:increaseTranslation( ( wx - tx ) * ds / self.scale, ( wy - ty ) * ds / self.scale )
+		end,
+		scaleToPoint = function( self, s, wx, wy )
+			if not wx then
+				wx, wy = self:getMouseWorldCoordinates()
+			end
+
+			local tx, ty = self:getTranslation()
+			self:scaleBy( s )
+			self:increaseTranslation( ( wx - tx ) * ( s - 1 ) / s, ( wy - ty ) * ( s - 1 ) / s)
+		end,
 		-- Getters/setters
 		setViewportPosition = function( self, x, y ) self.x, self.y = x, y end,
 		getViewportPosition = function( self ) return self.x, self.y end,
