@@ -145,6 +145,5 @@ function love.keyreleased( key )
 end
 
 function love.wheelmoved( dx, dy )
-	if dy > 0 then mobileCam:scaleBy( 2 ) end
-	if dy < 0 then mobileCam:scaleBy( .5 ) end
+	mobileCam:scaleToPoint( 1 + dy / 10 )
 end

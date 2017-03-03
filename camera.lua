@@ -134,7 +134,7 @@ local function newCamera( w, h, flags )
 
 			local tx, ty = self:getTranslation()
 			self:scaleBy( s )
-			self:increaseTranslation( ( wx - tx ) * ( s - 1 ) / s, ( wy - ty ) * ( s - 1 ) / s)
+			self:increaseTranslation( ( wx - tx ) * ( 1 - 1 / s ), ( wy - ty ) * ( 1 - 1 / s ) )
 		end,
 		-- Getters/setters
 		setViewportPosition = function( self, x, y ) self.x, self.y = x, y end,
