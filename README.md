@@ -84,27 +84,27 @@ __Synopsis__: `cam:pop( layer )`
 
 - `layer`: `nil`, _String_, or _table_. See [cam:push](#campush) for a detailed description of the layer. By default, this is just the same as calling [love.graphics.pop](#https://love2d.org/wiki/love.graphics.pop), so specifying the layer isn't required unless you want to for stylistic reasons.
 
-### cam:toWorldCoordinates
+### cam:getWorldCoordinates
 
 Returns the position within the "world," i.e. what the camera is seeing. Translates mouse coordinates to in-game coordinates.
 
-__Synopsis__: `worldX, worldY = cam:toWorldCoordinates( screenX, screenY )`
+__Synopsis__: `worldX, worldY = cam:getWorldCoordinates( screenX, screenY )`
 
 - `worldX, worldY`: _Numbers_. The word-coordinates of the mouse.
 - `screenX, screenY`: _Numbers_. The coordinates on-screen, i.e. the mouse usually.
 
-### cam:toScreenCoordinates
+### cam:getScreenCoordinates
 
-Translates in-game coordinates to the screen. The opposite of [cam:toWorldCoordinates](#camtoworldcoordinates).
+Translates in-game coordinates to the screen. The opposite of [cam:getWorldCoordinates](#camtoworldcoordinates).
 
-__Synopsis__: `screenX, screenY = cam:toWorldCoordinates( worldX, worldY )`
+__Synopsis__: `screenX, screenY = cam:getWorldCoordinates( worldX, worldY )`
 
 - `screenX, screenY`: _Numbers_. The coordinates on-screen, i.e. the mouse usually.
 - `worldX, worldY`: _Numbers_. The word-coordinates of the mouse.
 
 ### cam:getMouseWorldCoordinates
 
-Short for `cam:toScreenCoordinates( love.mouse.getPosition() )`. See [cam:toScreenCoordinates](#camtoscreencoordinates) for more.
+Short for `cam:getScreenCoordinates( love.mouse.getPosition() )`. See [cam:getScreenCoordinates](#camtoscreencoordinates) for more.
 
 __Synopsis__: `screenX, screenY = cam:getMouseWorldCoordinates( layer )`
 

@@ -96,7 +96,7 @@ local function newCamera( w, h, flags )
 		end,
 		push = function( self, layer ) self:getLayer( layer or 'main' ):push() end,
 		pop = function( self, layer ) self:getLayer( layer or 'main' ):pop() end,
-		toWorldCoordinates = function( self, x, y, layer )
+		getWorldCoordinates = function( self, x, y, layer )
 			layer = self:getLayer( layer or 'main' )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.x - self.offsetX, y - self.y - self.offsetY
@@ -104,7 +104,7 @@ local function newCamera( w, h, flags )
 			x, y = x / scaleFactor, y / scaleFactor
 			return x + self.translationX * layer.relativeScale, y + self.translationY * layer.relativeScale
 		end,
-		toScreenCoordinates = function( self, x, y, layer )
+		getScreenCoordinates = function( self, x, y, layer )
 			layer = self:getLayer( layer or 'main' )
 			local scaleFactor = self.scale * self.aspectRatioScale * layer.scale
 			x, y = x - self.translationX / layer.relativeScale, y - self.translationY * layer.relativeScale
@@ -116,7 +116,7 @@ local function newCamera( w, h, flags )
 		getMouseWorldCoordinates = function( self, layer )
 			layer = self:getLayer( layer or 'main' )
 			local x, y = love.mouse.getPosition()
-			return self:toWorldCoordinates( x, y, layer )
+			return self:getWorldCoordinates( x, y, layer )
 		end,
 		increaseScaleToPoint = function( self, ds, wx, wy )
 			if not wx then

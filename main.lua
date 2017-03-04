@@ -67,10 +67,10 @@ end
 function love.update( dt )
 	local moveSpeed = 300 / mobileCam.scale
 
-	-- Proves that toWorldCoordinates and toScreenCoordinates are accurate
+	-- Proves that getWorldCoordinates and getScreenCoordinates are accurate
 	-- Floating points may cause this to be _almost_ the same
 	-- local x, y = love.mouse.getPosition()
-	-- local _x, _y = mobileCam:toScreenCoordinates( mobileCam:toWorldCoordinates( x, y ) )
+	-- local _x, _y = mobileCam:getScreenCoordinates( mobileCam:getWorldCoordinates( x, y ) )
 	-- assert( x == _x and y == _y, x .. '~=' .. _x .. ', ' .. y .. '~=' .. _y )
 
 	if love.keyboard.isDown( 'q' ) then mobileCam:rotate( math.pi * dt ) end
@@ -84,12 +84,12 @@ function love.update( dt )
 		local x, y = love.mouse.getPosition()
 		if  x > mobileCam.x and x < mobileCam.x + mobileCam.w
 		and y > mobileCam.y and y < mobileCam.y + mobileCam.h then
-			local newX, newY = mobileCam:toWorldCoordinates( x, y )
+			local newX, newY = mobileCam:getWorldCoordinates( x, y )
 			newSquare( newX, newY, offset / mobileCam.scale, offset / mobileCam.scale )
 		end
 		if  x > overviewCam.x and x < overviewCam.x + overviewCam.w
 		and y > overviewCam.y and y < overviewCam.y + overviewCam.h then
-			local newX, newY = overviewCam:toWorldCoordinates( x, y )
+			local newX, newY = overviewCam:getWorldCoordinates( x, y )
 			newSquare( newX, newY, offset / mobileCam.scale, offset / mobileCam.scale )
 		end
 	end
