@@ -148,7 +148,7 @@ local function newCamera( w, h, flags )
 		getRotation = function( self ) return self.rotation end,
 		increaseRotation = function( self, dr ) self.rotation = self.rotation + dr end,
 		setScale = function( self, s ) self.scale = s end,
-		getScale = function( sel ) return self.scale end,
+		getScale = function( self ) return self.scale end,
 		increaseScale = function( self, ds ) self.scale = self.scale + ds end,
 		scaleBy = function( self, ds ) self.scale = self.scale * ds end,
 	}
