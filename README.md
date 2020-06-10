@@ -63,6 +63,7 @@ __Synopsis__: `cam = Camera.newCamera( w, h, flags )` or `cam = Camera( w, h, fl
 	- `rotation`: _Number_ (Defaults to `0`). The rotation of the camera.
 	- `resizable`: _Boolean_ (Defaults to `false`). `true` if the camera can be resized, `false` if it cannot.
 	- `maintainAspectRatio`: _Boolean_ (Defaults to `false`). `true` if the initial aspect ratio should be maintained, false if it shouldn't.
+	- `center`: _Boolean_ (Defaults to `false`). `true` if offsets should be centered on a screen, false if it shouldn't.
 	- `mode`: _String_ (Defaults to `'transform'`). The [StackType] to use for `push`ing and `pop`ing the camera.
 	- `update`: _Function_. The function called every frame used to control scaling and size. By default, if the camera is resizable, the resizing function is called, passing itself and the results of `cam:getContainerDimensions`.
 	- `resizingFunction`: _Function_. Only called if the `resizable` flag is true. Used to set the width and height of the camera, as well as any other changes due to resizing. By default, the function changes the `aspectRatioScale`, `offsetX` and `offsetY`, `w`, and `h` of the camera and takes the parameters `self`, `containerW`, and `containerH`.

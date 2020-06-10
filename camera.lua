@@ -70,6 +70,7 @@ local function newCamera( w, h, flags )
 		rotation = 0,
 		resizable = false,
 		maintainAspectRatio = false,
+		center = false,
 		aspectRatioScale = 1, -- Controls scale due to resizing
 		mode = 'transform',
 		layers = {},
@@ -88,6 +89,11 @@ local function newCamera( w, h, flags )
 			end
 			self.aspectRatioScale = self.w / w
 			self.offsetX, self.offsetY = self.w / 2, self.h / 2
+
+			if self.center then
+				self.offsetX = self.offsetX + (containerW - self.w) / 2
+				self.offsetY = self.offsetY + (containerH - self.h) / 2
+			end
 		end,
 		getContainerDimensions = function( self ) return love.graphics.getDimensions() end,
 		addLayer = addLayer,
@@ -157,6 +163,12 @@ local function newCamera( w, h, flags )
 
 	mixin( new, flags )
 	addLayer( new, 'main', 1 )
+
+	if new.center then
+		local containerW, containerH = new:getContainerDimensions()
+		new.offsetX = new.offsetX + (containerW - new.w) / 2
+		new.offsetY = new.offsetY + (containerH - new.h) / 2
+	end
 
 	return new
 end
